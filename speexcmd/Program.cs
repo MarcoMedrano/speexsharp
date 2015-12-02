@@ -11,13 +11,22 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
+            Encode();
+            //Decode();
+
+            Console.WriteLine("Finished!");
+            Console.ReadKey();
+        }
+
+        private static void Encode()
+        {
             byte[] buffer = null;
 
             using (var fileStream = new FileStream("gate10.decode.raw", FileMode.Open, FileAccess.Read))
             {
-                buffer = new byte[fileStream.Length];     
-                int count;                            
-                int offset = 0;                       
+                buffer = new byte[fileStream.Length];
+                int count;
+                int offset = 0;
 
                 // read until Read method returns 0 (end of the stream has been reached)  
                 while ((count = fileStream.Read(buffer, offset, offset + 1024)) > 0)
@@ -31,9 +40,30 @@ namespace speexcmd
             {
                 fileStream.Write(encodedBuffer, 0, encodedBuffer.Length);
             }
+        }
 
-            Console.WriteLine("Finished!");
-            Console.ReadKey();
+        private static void Decode()
+        {
+            byte[] buffer = null;
+
+            using (var fileStream = new FileStream("speex.sample1.encoded.spx", FileMode.Open, FileAccess.Read))
+            {
+                buffer = new byte[fileStream.Length];
+                int count;
+                int offset = 0;
+
+                // read until Read method returns 0 (end of the stream has been reached)  
+                while ((count = fileStream.Read(buffer, offset, offset + 1024)) > 0)
+                    offset += 1024;  // sum is a buffer offset for next reading
+            }
+
+            Speex speex = new Speex(1);
+            byte[] encodedBuffer = speex.Decode(buffer);
+
+            using (var fileStream = new FileStream("speex.sample1.decoded.raw", FileMode.Create, FileAccess.Write))
+            {
+                fileStream.Write(encodedBuffer, 0, encodedBuffer.Length);
+            }
         }
     }
 }
