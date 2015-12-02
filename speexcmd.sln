@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "speexcmd", "speexcmd\speexcmd.csproj", "{8EFDB53A-8EEC-4DA4-B77B-50E51300543E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpeexWrapper", "speexwrapper\SpeexWrapper.vcxproj", "{582133E9-73A8-4EE0-9E28-418D08537E8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,14 @@ Global
 		{8EFDB53A-8EEC-4DA4-B77B-50E51300543E}.Release|x64.Build.0 = Release|Any CPU
 		{8EFDB53A-8EEC-4DA4-B77B-50E51300543E}.Release|x86.ActiveCfg = Release|Any CPU
 		{8EFDB53A-8EEC-4DA4-B77B-50E51300543E}.Release|x86.Build.0 = Release|Any CPU
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Debug|x64.ActiveCfg = Debug|Win32
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Debug|x86.ActiveCfg = Debug|Win32
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Debug|x86.Build.0 = Debug|Win32
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Release|Any CPU.ActiveCfg = Release|Win32
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Release|x64.ActiveCfg = Release|Win32
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Release|x86.ActiveCfg = Release|Win32
+		{582133E9-73A8-4EE0-9E28-418D08537E8C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
