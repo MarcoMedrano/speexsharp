@@ -18,7 +18,7 @@ namespace speexcmd
                 int count;                            
                 int offset = 0;                       
 
-                // read until Read method returns 0 (end of the stream has been reached)
+                // read until Read method returns 0 (end of the stream has been reached)  
                 while ((count = fileStream.Read(buffer, offset, offset + 1024)) > 0)
                     offset += 1024;  // sum is a buffer offset for next reading
             }
