@@ -24,7 +24,7 @@ namespace speexcmd
                     offset += 1024;  // sum is a buffer offset for next reading
             }
 
-            Speex speex = new Speex(10);
+            Speex speex = new Speex(1);
             byte[] encodedBuffer = speex.Encode(buffer);
 
             using (var fileStream = new FileStream("files/gate10.encoded.spx", FileMode.Create, FileAccess.Write))
