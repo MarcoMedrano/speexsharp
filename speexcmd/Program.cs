@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace speexcmd
 {
-    //testing credentials WORKING branch
+    //testing  all
     class Program
     {
         static void Main(string[] args)
