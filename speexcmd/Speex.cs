@@ -44,6 +44,11 @@ namespace speexcmd
             return convert;
         }
 
+        public bool Decode(string inFile, string outFile)
+        {
+            return Speex.decoder_decode(inFile, outFile);
+        }
+
         /// <summary> 
         /// The encoded data is decoded to obtain the original audio data.
         /// </ Summary>        
@@ -88,7 +93,7 @@ namespace speexcmd
         internal extern static int encoder_encode(string inFile, string outFile);
 
         [DllImport("SpeexWrapper.dll", EntryPoint = "decoder_decode")]
-        internal extern static void decoder_decode(string inFile, string outFile);
+        internal extern static bool decoder_decode(string inFile, string outFile);
         #endregion
     }
 }
