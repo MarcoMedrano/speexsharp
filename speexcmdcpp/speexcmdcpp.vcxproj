@@ -121,10 +121,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\speexwrapper\skeleton.c" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\files\speex.sample1.encoded.spx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\speexwrapper\skeleton.h" />
+    <ClInclude Include="..\speexwrapper\wav_io.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
