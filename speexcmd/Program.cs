@@ -29,14 +29,14 @@ namespace speexcmd
             Speex speex = new Speex(1);
             bool response = speex.Decode("agmu1.spx", "amug1.raw");
             Console.WriteLine("Decoded {0}", response ? "Success" : "Failed");
+            
+            //byte[] buffer = File.ReadAllBytes("speex.sample1.encoded.spx");
+            //byte[] encodedBuffer = speex.Decode(buffer);
 
-            byte[] buffer = File.ReadAllBytes("speex.sample1.encoded.spx");
-            byte[] encodedBuffer = speex.Decode(buffer);
-
-            using (var fileStream = new FileStream("speex.sample1.decoded.raw", FileMode.Create, FileAccess.Write))
-            {
-                fileStream.Write(encodedBuffer, 0, encodedBuffer.Length);
-            }
+            //using (var fileStream = new FileStream("speex.sample1.decoded.raw", FileMode.Create, FileAccess.Write))
+            //{
+            //    fileStream.Write(encodedBuffer, 0, encodedBuffer.Length);
+            //}
         }
     }
 }
