@@ -20,15 +20,8 @@ namespace speexcmd
 
         private static void Encode()
         {
-            byte[] buffer = File.ReadAllBytes("gate10.decode.raw");
-
-            Speex speex = new Speex(10);
-            byte[] encodedBuffer = speex.Encode(buffer);
-
-            using (var fileStream = new FileStream("gate10.encoded.spx", FileMode.Create, FileAccess.Write))
-            {
-                fileStream.Write(encodedBuffer, 0, encodedBuffer.Length);
-            }
+            Speex speex = new Speex(8);
+            bool response = speex.Encode("gate10.decode.raw", "agmu1.spx");
         }
 
         private static void Decode()

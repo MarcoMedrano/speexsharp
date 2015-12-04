@@ -69,8 +69,8 @@
       <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libspeex.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib\speex;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libspeex.lib;libogg_static.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib\ogg;lib\speex;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
       <TargetMachine>MachineX86</TargetMachine>
@@ -101,14 +101,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="skeleton.cpp" />
     <ClCompile Include="Speex.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="wav_io.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="skeleton.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="wav_io.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
