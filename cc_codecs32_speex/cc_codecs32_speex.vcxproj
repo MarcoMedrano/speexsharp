@@ -74,6 +74,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
       <TargetMachine>MachineX86</TargetMachine>
+      <ModuleDefinitionFile>cc_codecs32_speex.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
       <Command>copy $(TargetPath) ..\refs\$(TargetFileName) /Y</Command>
