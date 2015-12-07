@@ -12,7 +12,7 @@ namespace speexcmd
         static void Main(string[] args)
         {
             Encode();
-           // Decode();
+            Decode();
 
             Console.WriteLine("Finished!");
             Console.ReadKey();
