@@ -27,10 +27,10 @@ namespace speexcmd
         /// </ Summary>         
         /// <param name = "inFile" >  input file </ param> 
         /// <param name = "outFile" >  output file </ param> 
-        public bool Encode(string inFile, string outFile)
+        public bool Encode(string inFile, int qualityIn, string outFile)
         {
             bool convert = false;
-            int response = SpeexCommons.EncodeSpeex(inFile, outFile);
+            int response = SpeexCommons.EncodeSpeex(inFile, qualityIn, outFile);
             convert = response == 0 ? true : false;
             
             return convert;

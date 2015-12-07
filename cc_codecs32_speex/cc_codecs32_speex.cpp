@@ -531,7 +531,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
     return TRUE;
 }
 
-int  __stdcall EncodeSpeex(const   char *inFile, const   char *outFile)
+int  __stdcall EncodeSpeex(const   char *inFile, int qualityIn, const   char *outFile)
 {
 	int nb_samples, total_samples = 0, nb_encoded;
 	int c;
@@ -586,6 +586,8 @@ int  __stdcall EncodeSpeex(const   char *inFile, const   char *outFile)
 	snprintf(vendor_string, sizeof(vendor_string), "Encoded with Speex %s", speex_version);
 
 	comment_init(&comments, &comments_length, vendor_string);
+	quality = qualityIn;
+	vbr_quality = qualityIn;
 	//inFile = "gate10.decode.raw";
 	//outFile = "agmu.spx";
 

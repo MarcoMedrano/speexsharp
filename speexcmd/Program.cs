@@ -21,7 +21,7 @@ namespace speexcmd
         private static void Encode()
         {
             Speex speex = new Speex();
-            bool response = speex.Encode("gate10.decode.raw", "agmu1.spx");
+            bool response = speex.Encode("gate10.decode.raw", 5, "agmu1.spx");
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
