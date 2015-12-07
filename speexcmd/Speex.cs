@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CallCopy.Media.Audio;
 
 namespace speexcmd
 {
@@ -12,7 +13,6 @@ namespace speexcmd
         /// <summary> 
         /// Initialize.
         /// </ Summary> 
-        /// <param name = "quality" > encoding quality, value 0 ~ 10 </ param> 
         public Speex()
         {
         }
@@ -30,7 +30,7 @@ namespace speexcmd
         public bool Encode(string inFile, string outFile)
         {
             bool convert = false;
-            int response = Speex.EncodeSpeex(inFile, outFile);
+            int response = SpeexCommons.EncodeSpeex(inFile, outFile);
             convert = response == 0 ? true : false;
             
             return convert;
@@ -43,18 +43,9 @@ namespace speexcmd
         /// <param name = "outFile" >  output file </ param> 
         public bool Decode(string inFile, string outFile)
         {
-            return Speex.DecodeSpeex(inFile, outFile);
+            return SpeexCommons.DecodeSpeex(inFile, outFile);
         }
 
-
-        #region Marshalling
-
-            [DllImport("cc_codecs32_speex.dll")]
-        public extern static int EncodeSpeex(string inFile, string outFile);
-
-            [DllImport("cc_codecs32_speex.dll")]
-            public extern static bool DecodeSpeex(string inFile, string outFile);
-        #endregion
     }
 }
 
