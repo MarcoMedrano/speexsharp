@@ -33,6 +33,7 @@
 
 #include "skeleton.h"
 
+using namespace std;
 
 /*Write an Ogg page to a file pointer*/
 int oe_write_page(ogg_page *page, FILE *fp)
@@ -530,12 +531,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
     return TRUE;
 }
 
-extern  "C" __declspec(dllexport) int test_plus_plus(int number)
-{
-    return ++number;
-}
-
-extern  "C" __declspec(dllexport) int encoder_encode(const   char *inFile, const   char *outFile)
+int  __stdcall EncodeSpeex(const   char *inFile, const   char *outFile)
 {
 	int nb_samples, total_samples = 0, nb_encoded;
 	int c;
@@ -973,7 +969,7 @@ extern  "C" __declspec(dllexport) int encoder_encode(const   char *inFile, const
 }
 
 
-extern  "C" __declspec(dllexport) bool decoder_decode(const   char *inFile, const   char *outFile)
+extern  "C" __declspec(dllexport) bool  __stdcall DecodeSpeex(const   char *inFile, const   char *outFile)
 {
     int c;
     int option_index = 0;

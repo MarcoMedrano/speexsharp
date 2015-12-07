@@ -112,6 +112,7 @@
     <ClCompile Include="wav_io.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cc_codecs32_speex.h" />
     <ClInclude Include="skeleton.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="wave_out.h" />

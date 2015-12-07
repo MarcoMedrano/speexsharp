@@ -15,7 +15,6 @@ namespace speexcmd
         /// <param name = "quality" > encoding quality, value 0 ~ 10 </ param> 
         public Speex()
         {
-            int var  = Speex.TestPlusPlus(1);
         }
 
         public void Dispose()
@@ -31,7 +30,7 @@ namespace speexcmd
         public bool Encode(string inFile, string outFile)
         {
             bool convert = false;
-            int response = Speex.encoder_encode(inFile, outFile);
+            int response = Speex.EncodeSpeex(inFile, outFile);
             convert = response == 0 ? true : false;
             
             return convert;
@@ -44,20 +43,17 @@ namespace speexcmd
         /// <param name = "outFile" >  output file </ param> 
         public bool Decode(string inFile, string outFile)
         {
-            return Speex.decoder_decode(inFile, outFile);
+            return Speex.DecodeSpeex(inFile, outFile);
         }
-           
 
-        #region Pinvoke 
 
-        [DllImport("cc_codecs32_speex.dll", EntryPoint = "test_plus_plus")]
-        internal extern static int TestPlusPlus(int number);
+        #region Marshalling
 
-        [DllImport("cc_codecs32_speex.dll", EntryPoint = "encoder_encode")]
-        internal extern static int encoder_encode(string inFile, string outFile);
+            [DllImport("cc_codecs32_speex.dll")]
+        public extern static int EncodeSpeex(string inFile, string outFile);
 
-        [DllImport("cc_codecs32_speex.dll", EntryPoint = "decoder_decode")]
-        internal extern static bool decoder_decode(string inFile, string outFile);
+            [DllImport("cc_codecs32_speex.dll")]
+            public extern static bool DecodeSpeex(string inFile, string outFile);
         #endregion
     }
 }
