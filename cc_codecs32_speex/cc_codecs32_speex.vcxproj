@@ -18,7 +18,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccProvider>SAK</SccProvider>
     <Keyword>ManagedCProj</Keyword>
-    <ProjectName>SpeexWrapper</ProjectName>
+    <ProjectName>cc_codecs32_speex</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -102,7 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="skeleton.cpp" />
-    <ClCompile Include="Speex.cpp" />
+    <ClCompile Include="cc_codecs32_speex.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -115,6 +115,9 @@
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="wave_out.h" />
     <ClInclude Include="wav_io.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cc_codecs32_speex.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

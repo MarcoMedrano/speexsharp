@@ -26,6 +26,8 @@ namespace speexcmd
         /// <summary> 
         /// Encoding audio data will be collected.
         /// </ Summary>         
+        /// <param name = "inFile" >  input file </ param> 
+        /// <param name = "outFile" >  output file </ param> 
         public bool Encode(string inFile, string outFile)
         {
             bool convert = false;
@@ -35,6 +37,11 @@ namespace speexcmd
             return convert;
         }
 
+        /// <summary> 
+        /// Decoding audio data will be collected.
+        /// </ Summary>         
+        /// <param name = "inFile" >  input file </ param> 
+        /// <param name = "outFile" >  output file </ param> 
         public bool Decode(string inFile, string outFile)
         {
             return Speex.decoder_decode(inFile, outFile);
@@ -43,13 +50,13 @@ namespace speexcmd
 
         #region Pinvoke 
 
-        [DllImport("SpeexWrapper.dll", EntryPoint = "test_plus_plus")]
+        [DllImport("cc_codecs32_speex.dll", EntryPoint = "test_plus_plus")]
         internal extern static int TestPlusPlus(int number);
-        
-        [DllImport("SpeexWrapper.dll", EntryPoint = "encoder_encode")]
+
+        [DllImport("cc_codecs32_speex.dll", EntryPoint = "encoder_encode")]
         internal extern static int encoder_encode(string inFile, string outFile);
 
-        [DllImport("SpeexWrapper.dll", EntryPoint = "decoder_decode")]
+        [DllImport("cc_codecs32_speex.dll", EntryPoint = "decoder_decode")]
         internal extern static bool decoder_decode(string inFile, string outFile);
         #endregion
     }

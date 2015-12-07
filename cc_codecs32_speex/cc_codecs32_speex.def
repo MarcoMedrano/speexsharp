@@ -1,0 +1,7 @@
+LIBRARY	"cc_codecs32_speex"
+DESCRIPTION 'Library for encoding/decoding speex files.'
+
+EXPORTS
+	test_plus_plus
+	encoder_encode
+	decoder_decode
