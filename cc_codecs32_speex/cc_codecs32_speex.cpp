@@ -9,18 +9,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+/*Encode stuff*/
 #include <speex/speex.h>
 #include <ogg/ogg.h>
 #include "wav_io.h"
-#include <speex/speex_header.h>
-#include <speex/speex_stereo.h>
-#include <speex/speex_preprocess.h>
-
 #include <speex/speex_echo.h>
 #include <speex/speex_preprocess.h>
 #include <speex/speex_stereo.h>
 #include <speex/speex_header.h>
+/*Finished Encode stuff*/
 /*Decode stuff*/
 #include "speex/speex_callbacks.h"
 #include "wave_out.h"
