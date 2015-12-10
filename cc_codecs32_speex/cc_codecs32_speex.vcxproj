@@ -104,6 +104,7 @@
   <ItemGroup>
     <ClCompile Include="skeleton.cpp" />
     <ClCompile Include="cc_codecs32_speex.cpp" />
+    <ClCompile Include="speexencoder.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -114,6 +115,7 @@
   <ItemGroup>
     <ClInclude Include="cc_codecs32_speex.h" />
     <ClInclude Include="skeleton.h" />
+    <ClInclude Include="speexencoder.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="wave_out.h" />
     <ClInclude Include="wav_io.h" />
