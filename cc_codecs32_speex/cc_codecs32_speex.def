@@ -2,5 +2,7 @@ LIBRARY	"cc_codecs32_speex"
 DESCRIPTION 'Library for encoding/decoding speex files.'
 
 EXPORTS
+	EncodeSpeexFromBuffer
+	EncodeSpeexFromFile
 	EncodeSpeex
 	DecodeSpeex
