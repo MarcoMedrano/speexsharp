@@ -10,10 +10,10 @@
 #include <string.h>
 #include <time.h>
 /*Encode stuff*/
-#include <speex/speex.h>
-#include <ogg/ogg.h>
+//#include <speex/speex.h>
+//#include <ogg/ogg.h>
 #include "wav_io.h"
-#include <speex/speex_echo.h>
+//#include <speex/speex_echo.h>
 #include <speex/speex_preprocess.h>
 #include <speex/speex_stereo.h>
 #include <speex/speex_header.h>
@@ -32,6 +32,8 @@
 #endif
 
 #include "skeleton.h"
+
+#include "SpeexDecoder.h"
 
 using namespace std;
 
@@ -971,8 +973,17 @@ int  __stdcall EncodeSpeex(const   char *inFile, int qualityIn, const   char *ou
 }
 
 
-extern  "C" __declspec(dllexport) bool  __stdcall DecodeSpeex(const   char *inFile, const   char *outFile)
+extern  "C" __declspec(dllexport) char*  __stdcall DecodeSpeex(const   char *inFile, char** outBuf, int* size)
 {
+//    unsigned char* outBuf = (unsigned char*)malloc(5000);
+    SpeexDecoder* decoder = new SpeexDecoder();
+    decoder->Initialize(inFile);
+    return decoder->Decode(outBuf, size);
+
+    const char *outFile = NULL;
+    /*FILE *fout = out_file_open((char *)outFile, rate, &channels);
+    fwrite(out + frame_offset*channels, sizeof(short), new_frame_size*channels, fout);*/
+//    return true;
     int c;
     int option_index = 0;
 //    char *inFile, *outFile;
@@ -1249,6 +1260,6 @@ extern  "C" __declspec(dllexport) bool  __stdcall DecodeSpeex(const   char *inFi
     if (fout != NULL)
         fclose(fout);
 
-    return 1;
+    return (char *)NULL;
 }
 

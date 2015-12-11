@@ -13,7 +13,7 @@ namespace CallCopy.Media.Audio
         public extern static int EncodeSpeex(string inFile, int qualityIn, string outFile);
 
         [DllImport("cc_codecs32_speex.dll")]
-        public extern static bool DecodeSpeex(string inFile, string outFile);       
+        public extern static IntPtr DecodeSpeex(string inFile, out IntPtr outBytes, out int size);       
         #endregion Marshalling
 
     }

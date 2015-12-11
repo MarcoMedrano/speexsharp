@@ -11,7 +11,7 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
-            Encode();
+            //Encode();
             Decode();
 
             Console.WriteLine("Finished!");
@@ -28,8 +28,8 @@ namespace speexcmd
         private static void Decode()
         {
             Speex speex = new Speex();
-            bool response = speex.Decode("agmu1.spx", "amug1.raw");
-            Console.WriteLine("Decoded {0}", response ? "Success" : "Failed");
+            speex.Decode("agmu1.spx", "amug1.raw");
+            //Console.WriteLine("Decoded {0}", response ? "Success" : "Failed");
 
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CallCopy.Media.Audio;
+using System.IO;
 
 namespace speexcmd
 {
@@ -41,9 +42,21 @@ namespace speexcmd
         /// </ Summary>         
         /// <param name = "inFile" >  input file </ param> 
         /// <param name = "outFile" >  output file </ param> 
-        public bool Decode(string inFile, string outFile)
+        public IntPtr Decode(string inFile, string outFile)
         {
-            return SpeexCommons.DecodeSpeex(inFile, outFile);
+            IntPtr pointerToBytes;
+            int size;
+            SpeexCommons.DecodeSpeex(inFile, out pointerToBytes, out size);
+
+            var destination = new byte[size];
+            Marshal.Copy(pointerToBytes, destination, 0, size);
+
+            using (var fileStream = new FileStream("test2.raw", FileMode.Create, FileAccess.Write))
+            {
+                fileStream.Write(destination, 0, destination.Length);
+            }
+
+            return pointerToBytes;
         }
 
     }
