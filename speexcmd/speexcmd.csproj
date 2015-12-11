@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\files\gate10.decode.raw">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\files\speex.sample1.encoded.spx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

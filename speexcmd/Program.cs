@@ -11,7 +11,7 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
-            Encode();
+            EncodeFromFile();
             Decode();
 
             Console.WriteLine("Finished!");
@@ -21,7 +21,22 @@ namespace speexcmd
         private static void Encode()
         {
             Speex speex = new Speex();
-            bool response = speex.Encode("gate10.decode.raw", 5, "agmu1.spx");
+            bool response = speex.Encode("gate10.decode.raw", 10, "agmu1.spx");
+            Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
+        }
+
+        private static void EncodeFromFile()
+        {
+            Speex speex = new Speex();
+            bool response = speex.EncodeFromFile("gate10.decode.raw", "agmu1.spx", 5 );
+            Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
+        }
+
+        private static void EncodeFromBuffer()
+        {
+            byte[] tempBuffer = new byte[3];
+            Speex speex = new Speex();
+            bool response = speex.EncodeFromBuffer("agmu1.spx", 5, tempBuffer, 0);
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 

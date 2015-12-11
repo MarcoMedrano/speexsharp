@@ -1,35 +1,23 @@
 #include "stdafx.h"
 #include "speexencoder.h"
+#include <stdio.h>
+#include <string.h>
+
 
 SpeexEncoder::SpeexEncoder()
 {
 	total_samples = 0;
 	mode = NULL;
-	vbr_enabled = 0;
-	vbr_max = 0;
-	abr_enabled = 0;
-	vad_enabled = 0;
-	dtx_enabled = 0;
 	modeID = -1;
 	rate = 0;
 	chan = 1;
-	fmt = 16;
 	quality = 3;
-	vbr_quality = 3;
-	lsb = 1;
-	nframes = 1;
 	complexity = 3;
 	bytes_written = 0;
-	close_in = 0;
-	close_out = 0;
 	eos = 0;
-	bitrate = 0;
 	cumul_bits = 0;
 	enc_frames = 0;
-	wave_input = 0;
 	preprocess = NULL;
-	denoise_enabled = 0;
-	agc_enabled = 0;
 	lookahead = 0;
 	closed = false;
 
@@ -58,14 +46,11 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 		chan = channels;
 	}
 	
-
 	speex_lib_ctl(SPEEX_LIB_GET_VERSION_STRING, (void*)&speex_version);
 	snprintf(vendor_string, sizeof(vendor_string), "Encoded with Speex %s", speex_version);
 
 	comment_init(&comments, &comments_length, vendor_string);
-	char outFile[100];
-	strcpy(outFile, (char*)filename);
-	strcat(outFile, ".spx");
+
 	/*Initialize Ogg stream struct*/
 	srand(time(NULL));
 	if (ogg_stream_init(&os, rand()) == -1)
@@ -73,34 +58,7 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 		fprintf(stderr, "Error: stream init failed\n");
 		exit(1);
 	}
-
-	if (strcmp(filename, "-") == 0)
-	{
-		_setmode(_fileno(stdin), _O_BINARY);
-		fin = stdin;
-	}
-	else
-	{
-		fin = fopen(filename, "rb");
-		if (!fin)
-		{
-			perror(filename);
-			exit(1);
-		}
-		close_in = 1;
-	}
-
-   {
-	   fread(first_bytes, 1, 12, fin);
-	   if (strncmp(first_bytes, "RIFF", 4) == 0 && strncmp(first_bytes, "RIFF", 4) == 0)
-	   {
-		   if (read_wav_header(fin, &rate, &chan, &fmt, &size) == -1)
-			   exit(1);
-		   wave_input = 1;
-		   lsb = 1; /* CHECK: exists big-endian .wav ?? */
-	   }
-   }
-
+	
    if (modeID == -1 )
    {
 	   /* By default, use narrowband/8 kHz */
@@ -117,90 +75,36 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	   mode = speex_lib_get_mode(modeID);
 
    speex_init_header(&header, rate, 1, mode);
-   header.frames_per_packet = nframes;
-   header.vbr = vbr_enabled;
+   header.frames_per_packet = 1;
+   header.vbr = 0;
    header.nb_channels = chan;
 
    {
 	   char *st_string = "mono";
 	   if (chan == 2)
 		   st_string = "stereo";
-
-		   fprintf(stderr, "Encoding %d Hz audio using %s mode (%s)\n",
-		   header.rate, mode->modeName, st_string);
+		fprintf(stderr, "Encoding %d Hz audio using %s mode (%s)\n",
+		header.rate, mode->modeName, st_string);
    }
 
    /*Initialize Speex encoder*/
    st = speex_encoder_init(mode);
-   if (strcmp(outFile, "-") == 0)
-   {
-	   _setmode(_fileno(stdout), _O_BINARY);
-	   fout = stdout;
-   }
-   else
-   {
-	   fout = fopen(outFile, "wb");
-	   if (!fout)
-	   {
-		   perror(outFile);
-		   exit(1);
-	   }
-	   close_out = 1;
-   }
+   fout = fopen(filename, "wb");
+	if (!fout)
+	{
+		perror(filename);
+		exit(1);
+	}
+
    speex_encoder_ctl(st, SPEEX_GET_FRAME_SIZE, &frame_size);
    speex_encoder_ctl(st, SPEEX_SET_COMPLEXITY, &complexity);
    speex_encoder_ctl(st, SPEEX_SET_SAMPLING_RATE, &rate);
    if (quality >= 0)
    {
-	   if (vbr_enabled)
-	   {
-		   if (vbr_max > 0)
-			   speex_encoder_ctl(st, SPEEX_SET_VBR_MAX_BITRATE, &vbr_max);
-		   speex_encoder_ctl(st, SPEEX_SET_VBR_QUALITY, &vbr_quality);
-	   }
-	   else
-		   speex_encoder_ctl(st, SPEEX_SET_QUALITY, &quality);
-   }
-   if (bitrate)
-   {
-	   if (quality >= 0 && vbr_enabled)
-		   fprintf(stderr, "Warning: --bitrate option is overriding --quality\n");
-	   speex_encoder_ctl(st, SPEEX_SET_BITRATE, &bitrate);
-   }
-   if (vbr_enabled)
-   {
-	   tmp = 1;
-	   speex_encoder_ctl(st, SPEEX_SET_VBR, &tmp);
-   }
-   else if (vad_enabled)
-   {
-	   tmp = 1;
-	   speex_encoder_ctl(st, SPEEX_SET_VAD, &tmp);
-   }
-   if (dtx_enabled)
-	   speex_encoder_ctl(st, SPEEX_SET_DTX, &tmp);
-   if (dtx_enabled && !(vbr_enabled || abr_enabled || vad_enabled))
-   {
-	   fprintf(stderr, "Warning: --dtx is useless without --vad, --vbr or --abr\n");
-   }
-   else if ((vbr_enabled || abr_enabled) && (vad_enabled))
-   {
-	   fprintf(stderr, "Warning: --vad is already implied by --vbr or --abr\n");
-   }
-
-   if (abr_enabled)
-   {
-	   speex_encoder_ctl(st, SPEEX_SET_ABR, &abr_enabled);
+	   speex_encoder_ctl(st, SPEEX_SET_QUALITY, &quality);
    }
 
    speex_encoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
-   if (denoise_enabled || agc_enabled)
-   {
-	   preprocess = speex_preprocess_state_init(frame_size, rate);
-	   speex_preprocess_ctl(preprocess, SPEEX_PREPROCESS_SET_DENOISE, &denoise_enabled);
-	   speex_preprocess_ctl(preprocess, SPEEX_PREPROCESS_SET_AGC, &agc_enabled);
-	   lookahead += frame_size;
-   }
 
    /*Write header*/
    {
@@ -253,26 +157,36 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 
    speex_bits_init(&bits);
 
-   if (!wave_input)
-   {
-	   nb_samples = read_samples(fin, frame_size, fmt, chan, lsb, input, first_bytes, NULL);
-   }
-   else {
-	   nb_samples = read_samples(fin, frame_size, fmt, chan, lsb, input, NULL, &size);
-   }
-   if (nb_samples == 0)
-	   eos = 1;
-   total_samples += nb_samples;
-   nb_encoded = -lookahead;
-
-
    return 0;
 }
 
 
-int SpeexEncoder::Encode()
+int SpeexEncoder::EncodeFromBuffer(char * buffer, size_t buffer_size)
+{
+	//fprintf(stderr, "buffer size aa---- %i", buffer_size);
+	FILE *f = tmpfile();//fopen("out.raw", "wb"); 
+	fwrite(buffer, 1, buffer_size, f);
+	fflush(f);
+	rewind(f);
+	return EncodeFromFile(f);
+}
+
+
+
+int SpeexEncoder::EncodeFromFile(FILE *fin)
 {
 	int id = -1;
+	int nframes = 1;
+	int lsb = 1;
+	int fmt = 16;
+	spx_int32_t size;
+	
+	nb_samples = read_samples(fin, frame_size, fmt, chan, lsb, input, &size);
+
+	if (nb_samples == 0)
+		eos = 1;
+	total_samples += nb_samples;
+	nb_encoded = -lookahead;
 	/*Main encoding loop (one frame per iteration)*/
 	while (!eos || total_samples > nb_encoded)
 	{
@@ -287,14 +201,8 @@ int SpeexEncoder::Encode()
 		speex_encode_int(st, input, &bits);
 
 		nb_encoded += frame_size;
+		nb_samples = read_samples(fin, frame_size, fmt, chan, lsb, input, NULL);
 
-		if (wave_input)
-		{
-			nb_samples = read_samples(fin, frame_size, fmt, chan, lsb, input, NULL, &size);
-		}
-		else {
-			nb_samples = read_samples(fin, frame_size, fmt, chan, lsb, input, NULL, NULL);
-		}
 		if (nb_samples == 0)
 		{
 			eos = 1;
@@ -333,6 +241,7 @@ int SpeexEncoder::Encode()
 			if (ret != og.header_len + og.body_len)
 			{
 				fprintf(stderr, "Error: failed writing header to output stream\n");
+				fclose(fin);
 				exit(1);
 			}
 			else
@@ -365,11 +274,15 @@ int SpeexEncoder::Encode()
 		if (ret != og.header_len + og.body_len)
 		{
 			fprintf(stderr, "Error: failed writing header to output stream\n");
+			fclose(fin);
 			exit(1);
 		}
 		else
 			bytes_written += ret;
 	}
+
+	fclose(fin);
+
 	return 0;
 }
 
@@ -384,39 +297,19 @@ void SpeexEncoder::Close()
 	speex_encoder_destroy(st);
 	speex_bits_destroy(&bits);
 	ogg_stream_clear(&os);
-
-	if (close_in)
-		fclose(fin);
-	if (close_out)
-		fclose(fout);
+	fclose(fout);
 	closed = true;
 }
 
-void SpeexEncoder::SetQuality(int qualityIn){
-
+void SpeexEncoder::SetQuality(int qualityIn)
+{
 	fprintf(stderr, "SpeexEncoder: SetQuality %i \n", qualityIn);
 	quality = qualityIn;
-	vbr_quality = qualityIn;
-
 	if (quality >= 0)
 	{
-		if (vbr_enabled)
-		{
-			if (vbr_max > 0)
-				speex_encoder_ctl(st, SPEEX_SET_VBR_MAX_BITRATE, &vbr_max);
-			speex_encoder_ctl(st, SPEEX_SET_VBR_QUALITY, &vbr_quality);
-		}
-		else
-			speex_encoder_ctl(st, SPEEX_SET_QUALITY, &quality);
-	}
-	if (bitrate)
-	{
-		if (quality >= 0 && vbr_enabled)
-			fprintf(stderr, "Warning: --bitrate option is overriding --quality\n");
-		speex_encoder_ctl(st, SPEEX_SET_BITRATE, &bitrate);
+		speex_encoder_ctl(st, SPEEX_SET_QUALITY, &quality);
 	}
 }
-
 
 
 /*Write an Ogg page to a file pointer*/
@@ -430,7 +323,7 @@ int  SpeexEncoder::oe_write_page(ogg_page *page, FILE *fp)
 }
 
 /* Convert input audio bits, endians and channels */
-int SpeexEncoder::read_samples(FILE *fin, int frame_size, int bits, int channels, int lsb, short * input, char *buff, spx_int32_t *size)
+int SpeexEncoder::read_samples(FILE *fin, int frame_size, int bits, int channels, int lsb, short * input, spx_int32_t *size)
 {
 	unsigned char in[MAX_FRAME_BYTES * 2];
 	int i;
@@ -444,17 +337,9 @@ int SpeexEncoder::read_samples(FILE *fin, int frame_size, int bits, int channels
 	/*Read input audio*/
 	if (size)
 		*size -= bits / 8 * channels*frame_size;
-	if (buff)
-	{
-		for (i = 0; i<12; i++)
-			in[i] = buff[i];
-		nb_read = fread(in + 12, 1, bits / 8 * channels*frame_size - 12, fin) + 12;
-		if (size)
-			*size += 12;
-	}
-	else {
-		nb_read = fread(in, 1, bits / 8 * channels* frame_size, fin);
-	}
+		
+	nb_read = fread(in, 1, bits / 8 * channels* frame_size, fin);
+
 	nb_read /= bits / 8 * channels;
 
 	/*fprintf (stderr, "%d\n", nb_read);*/
@@ -623,3 +508,4 @@ void SpeexEncoder::comment_add(char **comments, int* length, char *tag, char *va
 }
 #undef readint
 #undef writeint
+

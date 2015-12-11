@@ -36,53 +36,29 @@ class SpeexEncoder
 {
 
 private:
-
-
-
-
-
-public:
-
-	int nb_samples, total_samples , nb_encoded;
+	int nb_samples, total_samples, nb_encoded;
 	int c;
-	FILE *fin, *fout;
+	FILE *fout;
 	short input[MAX_FRAME_SIZE];
 	const SpeexMode *mode;
 	spx_int32_t frame_size;
-	spx_int32_t vbr_enabled;
-	spx_int32_t vbr_max;
-	int abr_enabled;
-	spx_int32_t vad_enabled;
-	spx_int32_t dtx_enabled;
 	int nbBytes;
 	int modeID;
 	void *st;
 	SpeexBits bits;
 	char cbits[MAX_FRAME_BYTES];
 	spx_int32_t rate;
-	spx_int32_t size;
-	int chan ;
-	int fmt ;
+	int chan;
 	spx_int32_t quality;
-	float vbr_quality;
-	int lsb;
-	int nframes ;
-	spx_int32_t complexity ;
+	spx_int32_t complexity;
 	const char* speex_version;
 	char vendor_string[64];
 	char *comments;
 	int comments_length;
-	int close_in ;
-	int close_out;
-	int eos ;
-	spx_int32_t bitrate;
-	char first_bytes[12];
-	spx_int32_t tmp;
+	int eos;
 	double cumul_bits, enc_frames;
-	int wave_input;
-	SpeexPreprocessState *preprocess ;
-	int denoise_enabled , agc_enabled ;
-	spx_int32_t lookahead ;
+	SpeexPreprocessState *preprocess;
+	spx_int32_t lookahead;
 
 	ogg_stream_state os;
 	ogg_stream_state so; /* ogg stream for skeleton bitstream */
@@ -91,12 +67,13 @@ public:
 	int bytes_written, ret, result;
 
 	bool closed;
-
+public:
 	SpeexEncoder();
 	~SpeexEncoder();
 
 	int				Initialize(const char* filename, char* modeInput, int channels);
-	int				Encode();
+	int				EncodeFromBuffer(char *buffer, size_t buffer_size);
+	int				EncodeFromFile(FILE *fin);
 	void			Close();
 	void            SetQuality(int qualityIn);
 	void            SetTitle(char* title);
@@ -105,7 +82,7 @@ public:
 	/*Write an Ogg page to a file pointer*/
 	int  oe_write_page(ogg_page *page, FILE *fp);
 	/* Convert input audio bits, endians and channels */
-	int read_samples(FILE *fin, int frame_size, int bits, int channels, int lsb, short * input, char *buff, spx_int32_t *size);
+	int read_samples(FILE *fin, int frame_size, int bits, int channels, int lsb, short * input, spx_int32_t *size);
 	void add_fishead_packet(ogg_stream_state *os);
 	/*
 	* Adds the fishead packets in the skeleton output stream along with the e_o_s packet

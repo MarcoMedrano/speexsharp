@@ -29,11 +29,29 @@ namespace speexcmd
         /// <param name = "outFile" >  output file </ param> 
         public bool Encode(string inFile, int qualityIn, string outFile)
         {
-            bool convert = false;
-            int response = SpeexCommons.EncodeSpeex(inFile, qualityIn, outFile);
-            convert = response == 0 ? true : false;
-            
-            return convert;
+            return SpeexCommons.EncodeSpeex(inFile, qualityIn, outFile);
+        }
+
+
+        /// <summary> 
+        /// Encoding audio data will be collected.
+        /// </ Summary>         
+        /// <param name = "inFile" >  input file </ param> 
+        /// <param name = "outFile" >  output file </ param> 
+        public bool EncodeFromFile(string inFile,  string outFile,int qualityIn)
+        {
+            return SpeexCommons.EncodeSpeexFromFile(inFile, outFile, qualityIn);
+        }
+
+        /// <summary> 
+        /// Encoding audio data will be collected.
+        /// </ Summary>         
+        /// <param name = "inFile" >  input file </ param> 
+        /// <param name = "outFile" >  output file </ param> 
+        public bool EncodeFromBuffer(string outFile, int qualityIn, byte[] buffer, int buferSize)
+        {
+            return SpeexCommons.EncodeSpeexFromBuffer(outFile, qualityIn, buffer, buferSize);
+
         }
 
         /// <summary> 
