@@ -11,7 +11,7 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
-            EncodeFromFile();
+            //EncodeFromFile();
             Decode();
 
             Console.WriteLine("Finished!");

@@ -2,19 +2,20 @@
 #include <string.h>
 
 #include <speex/speex.h>
-#include <ogg/ogg.h>
-#include "wav_io.h"
 #include <speex/speex_echo.h>
 #include <speex/speex_preprocess.h>
 #include <speex/speex_stereo.h>
 #include <speex/speex_header.h>
-#include "SpeexDecoder.h"
-
 #include "speex/speex_callbacks.h"
+#include <ogg/ogg.h>
+#include "wav_io.h"
 #include "wave_out.h"
+
 #include <io.h>
 #include <fcntl.h>
 #include <sstream>
+
+#include "SpeexDecoder.h"
 
 SpeexDecoder::SpeexDecoder()
 {
@@ -45,7 +46,7 @@ int SpeexDecoder::Initialize(const char* spxFileName)
     speex_bits_init(&bits);
 }
 
-bool SpeexDecoder::Decode(char** outBuf, int* size)
+bool SpeexDecoder::Decode(char** outBuffer, int* outBufferSize)
 {
     std::stringstream outStream(std::ios::ios_base::in | std::ios::ios_base::out | std::ios::ios_base::binary);
 
@@ -146,7 +147,7 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
                 else if (packet_count == 1)
                 {
                     if (!quiet)
-                        print_comments((char*)op.packet, op.bytes);
+                        PrintComments((char*)op.packet, op.bytes);
                 }
                 else if (packet_count <= 1 + extra_headers)
                 {
@@ -198,43 +199,35 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
                             fputc(ch, stderr);
                             fprintf(stderr, "Bitrate is use: %d bps     ", tmp);
                         }
-                        /*Convert to short and save to output file*/
-                        /*if (strlen(outFile) != 0)
-                        {*/
-                            for (i = 0; i<frame_size*channels; i++)
-                                out[i] = le_short(output[i]);
-                        /*}
-                        else {
-                            for (i = 0; i<frame_size*channels; i++)
-                                out[i] = output[i];
-                        }*/
+                        
+                        for (i = 0; i<frame_size*channels; i++)
+                            out[i] = le_short(output[i]);
+
+                        int frame_offset = 0;
+                        int new_frame_size = frame_size;
+                        /*printf ("packet %d %d\n", packet_no, skip_samples);*/
+                        /*fprintf (stderr, "packet %d %d %d\n", packet_no, skip_samples, lookahead);*/
+                        if (packet_no == 1 && j == 0 && skip_samples > 0)
                         {
-                            int frame_offset = 0;
-                            int new_frame_size = frame_size;
-                            /*printf ("packet %d %d\n", packet_no, skip_samples);*/
-                            /*fprintf (stderr, "packet %d %d %d\n", packet_no, skip_samples, lookahead);*/
-                            if (packet_no == 1 && j == 0 && skip_samples > 0)
-                            {
-                                /*printf ("chopping first packet\n");*/
-                                new_frame_size -= skip_samples + lookahead;
-                                frame_offset = skip_samples + lookahead;
-                            }
-                            if (packet_no == page_nb_packets && skip_samples < 0)
-                            {
-                                int packet_length = nframes*frame_size + skip_samples + lookahead;
-                                new_frame_size = packet_length - j*frame_size;
-                                if (new_frame_size<0)
-                                    new_frame_size = 0;
-                                if (new_frame_size>frame_size)
-                                    new_frame_size = frame_size;
-                                /*printf ("chopping end: %d %d %d\n", new_frame_size, packet_length, packet_no);*/
-                            }
-                            if (new_frame_size > 0)
-                            {
-                                //fwrite(out + frame_offset*channels, sizeof(short), new_frame_size*channels, fout);
-                                outStream.write((const char*)out + frame_offset*channels, sizeof(short)*new_frame_size*channels);
-                                audio_size += sizeof(short)*new_frame_size*channels;
-                            }
+                            /*printf ("chopping first packet\n");*/
+                            new_frame_size -= skip_samples + lookahead;
+                            frame_offset = skip_samples + lookahead;
+                        }
+                        if (packet_no == page_nb_packets && skip_samples < 0)
+                        {
+                            int packet_length = nframes*frame_size + skip_samples + lookahead;
+                            new_frame_size = packet_length - j*frame_size;
+                            if (new_frame_size<0)
+                                new_frame_size = 0;
+                            if (new_frame_size>frame_size)
+                                new_frame_size = frame_size;
+                            /*printf ("chopping end: %d %d %d\n", new_frame_size, packet_length, packet_no);*/
+                        }
+                        if (new_frame_size > 0)
+                        {
+                            //fwrite(out + frame_offset*channels, sizeof(short), new_frame_size*channels, fout);
+                            outStream.write((const char*)out + frame_offset*channels, sizeof(short)*new_frame_size*channels);
+                            audio_size += sizeof(short)*new_frame_size*channels;
                         }
                     }
                 }
@@ -261,10 +254,10 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
 
     char* buffer = new char[audio_size];
     outStream.seekp(outStream.beg);
-    outStream.read((char*)buffer, audio_size);
+    outStream.read(buffer, audio_size);
 
-    *outBuf = buffer;
-    *size = audio_size;
+    *outBuffer = buffer;
+    *outBufferSize = audio_size;
     return true;
 }
 
@@ -273,7 +266,6 @@ void SpeexDecoder::Close()
     if (canCloseFileInput)
         fclose(fin);
 }
-
 
 void* SpeexDecoder::ProcessHeader(ogg_packet *op, spx_int32_t enh_enabled, spx_int32_t *frame_size, int *granule_frame_size, spx_int32_t *rate, int *nframes, int forceMode, int *channels, SpeexStereoState *stereo, int *extra_headers, int quiet)
 {
@@ -397,7 +389,7 @@ void* SpeexDecoder::ProcessHeader(ogg_packet *op, spx_int32_t enh_enabled, spx_i
                            ((buf[base+1]<<8)&0xff00)| \
                             (buf[base]&0xff))
 
-void SpeexDecoder::print_comments(char *comments, int length)
+void SpeexDecoder::PrintComments(char *comments, int length)
 {
     char *c = comments;
     int len, i, nb_fields;

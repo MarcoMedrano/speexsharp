@@ -24,5 +24,5 @@ private:
     SpeexBits       bits;
 
     void*    ProcessHeader(ogg_packet *op, spx_int32_t enh_enabled, spx_int32_t *frame_size, int *granule_frame_size, spx_int32_t *rate, int *nframes, int forceMode, int *channels, SpeexStereoState *stereo, int *extra_headers, int quiet);
-    void     print_comments(char *comments, int length);
+    void     PrintComments(char *comments, int length);
 };
