@@ -397,9 +397,8 @@ bool  __stdcall EncodeSpeex(const char *inFile, int qualityIn, const   char *out
 }
 
 
-extern  "C" __declspec(dllexport) char*  __stdcall DecodeSpeex(const   char *inFile, char** outBuf, int* size)
+extern  "C" __declspec(dllexport) bool __stdcall DecodeSpeex(const char *inFile, char** outBuf, int* size)
 {
-//    unsigned char* outBuf = (unsigned char*)malloc(5000);
     SpeexDecoder* decoder = new SpeexDecoder();
     decoder->Initialize(inFile);
     return decoder->Decode(outBuf, size);

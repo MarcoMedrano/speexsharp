@@ -43,9 +43,8 @@ namespace speexcmd
         private static void Decode()
         {
             Speex speex = new Speex();
-            speex.Decode("agmu1.spx", "amug1.raw");
-            //Console.WriteLine("Decoded {0}", response ? "Success" : "Failed");
-
+            bool isSuccess = speex.Decode("agmu1.spx", "amug1.raw");
+            Console.WriteLine("Decoded {0}", isSuccess ? "Success" : "Failed");
         }
     }
 }

@@ -50,7 +50,7 @@ int SpeexDecoder::Initialize(const char* spxFileName)
     speex_bits_init(&bits);
 }
 
-char* SpeexDecoder::Decode(char** outBuf, int* size)
+bool SpeexDecoder::Decode(char** outBuf, int* size)
 {
     FILE *fout = NULL;
     std::stringstream outStream(std::ios::ios_base::in | std::ios::ios_base::out | std::ios::ios_base::binary);
@@ -280,7 +280,7 @@ char* SpeexDecoder::Decode(char** outBuf, int* size)
 
     *outBuf = buffer;
     *size = audio_size;
-    return (char*)buffer;
+    return true;
 }
 
 void SpeexDecoder::Close()

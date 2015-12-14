@@ -58,23 +58,23 @@ namespace speexcmd
         /// <summary> 
         /// Decoding audio data will be collected.
         /// </ Summary>         
-        /// <param name = "inFile" >  input file </ param> 
-        /// <param name = "outFile" >  output file </ param> 
-        public IntPtr Decode(string inFile, string outFile)
+        /// <param name = "inFileName" >  input file </ param> 
+        /// <param name = "outFileName" >  output file </ param> 
+        public bool Decode(string inFileName, string outFileName)
         {
             IntPtr pointerToBytes;
             int size;
-            SpeexCommons.DecodeSpeex(inFile, out pointerToBytes, out size);
+            bool isSuccess = SpeexCommons.DecodeSpeex(inFileName, out pointerToBytes, out size);
 
             var destination = new byte[size];
             Marshal.Copy(pointerToBytes, destination, 0, size);
 
-            using (var fileStream = new FileStream("test2.raw", FileMode.Create, FileAccess.Write))
+            using (var fileStream = new FileStream(outFileName, FileMode.Create, FileAccess.Write))
             {
                 fileStream.Write(destination, 0, destination.Length);
             }
 
-            return pointerToBytes;
+            return isSuccess;
         }
 
     }

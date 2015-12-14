@@ -13,7 +13,7 @@ public:
     ~SpeexDecoder();
 
     int     Initialize(const char* spxFileName);
-    char*   Decode(char** outBuf, int* size);
+    bool    Decode(char** outBuf, int* size);
     void    Close();
     int     GetChannels() { return channels; }
     long    GetRate() { return rate; }
