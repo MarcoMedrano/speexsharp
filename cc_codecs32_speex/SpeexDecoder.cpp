@@ -16,14 +16,10 @@
 #include <fcntl.h>
 #include <sstream>
 
-//using std;
-using std::ios;
-
 SpeexDecoder::SpeexDecoder()
 {
     fin = NULL;
-    close_in = 0;
-    closed = false;
+    canCloseFileInput = false;
 }
 
 SpeexDecoder::~SpeexDecoder()
@@ -42,17 +38,15 @@ int SpeexDecoder::Initialize(const char* spxFileName)
         perror(spxFileName);
         exit(1);
     }
-    close_in = 1;
+    canCloseFileInput = true;
 
     /*Init Ogg data struct*/
     ogg_sync_init(&oy);
-
     speex_bits_init(&bits);
 }
 
 bool SpeexDecoder::Decode(char** outBuf, int* size)
 {
-    FILE *fout = NULL;
     std::stringstream outStream(std::ios::ios_base::in | std::ios::ios_base::out | std::ios::ios_base::binary);
 
     int outBufOffset = 0;
@@ -142,14 +136,12 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
                 /*If first packet, process as Speex header*/
                 if (packet_count == 0)
                 {
-                    st = process_header(&op, enh_enabled, &frame_size, &granule_frame_size, &rate, &nframes, forceMode, &channels, &stereo, &extra_headers, quiet);
+                    st = ProcessHeader(&op, enh_enabled, &frame_size, &granule_frame_size, &rate, &nframes, forceMode, &channels, &stereo, &extra_headers, quiet);
                     if (!st)
                         exit(1);
                     speex_decoder_ctl(st, SPEEX_GET_LOOKAHEAD, &lookahead);
                     if (!nframes)
                         nframes = 1;
-                    //TO REMOVE
-                    fout = out_file_open((char *)"test.raw", rate, &channels);
                 }
                 else if (packet_count == 1)
                 {
@@ -239,12 +231,8 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
                             }
                             if (new_frame_size > 0)
                             {
-                                /*memcpy(outBuf + outBufOffset, out + frame_offset*channels, sizeof(short)*new_frame_size*channels);
-                                outBufOffset += sizeof(short)*new_frame_size*channels;*/
                                 //fwrite(out + frame_offset*channels, sizeof(short), new_frame_size*channels, fout);
                                 outStream.write((const char*)out + frame_offset*channels, sizeof(short)*new_frame_size*channels);
-                                int lenght = outStream.tellp();
-                                
                                 audio_size += sizeof(short)*new_frame_size*channels;
                             }
                         }
@@ -255,7 +243,6 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
         }
         if (feof(fin))
             break;
-
     }
 
     if (st)
@@ -269,14 +256,12 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
         ogg_stream_clear(&os);
     ogg_sync_clear(&oy);
 
-    if (close_in)
+    if (canCloseFileInput)
         fclose(fin);
-    
+
     char* buffer = new char[audio_size];
     outStream.seekp(outStream.beg);
     outStream.read((char*)buffer, audio_size);
-    //fwrite(buffer, audio_size, fout);
-    fwrite(buffer, sizeof(char), audio_size, fout);
 
     *outBuf = buffer;
     *size = audio_size;
@@ -285,10 +270,12 @@ bool SpeexDecoder::Decode(char** outBuf, int* size)
 
 void SpeexDecoder::Close()
 {
+    if (canCloseFileInput)
+        fclose(fin);
 }
 
 
-void* SpeexDecoder::process_header(ogg_packet *op, spx_int32_t enh_enabled, spx_int32_t *frame_size, int *granule_frame_size, spx_int32_t *rate, int *nframes, int forceMode, int *channels, SpeexStereoState *stereo, int *extra_headers, int quiet)
+void* SpeexDecoder::ProcessHeader(ogg_packet *op, spx_int32_t enh_enabled, spx_int32_t *frame_size, int *granule_frame_size, spx_int32_t *rate, int *nframes, int forceMode, int *channels, SpeexStereoState *stereo, int *extra_headers, int quiet)
 {
     void *st;
     const SpeexMode *mode;
@@ -457,116 +444,4 @@ void SpeexDecoder::print_comments(char *comments, int length)
         c += len;
         fprintf(stderr, "\n");
     }
-}
-
-
-FILE* SpeexDecoder::out_file_open(char *outFile, int rate, int *channels)
-{
-    FILE *fout = NULL;
-    /*Open output file*/
-    if (strlen(outFile) == 0)
-    { 
-#if defined HAVE_SYS_SOUNDCARD_H
-        int audio_fd, format, stereo;
-        audio_fd = open("/dev/dsp", O_WRONLY);
-        if (audio_fd<0)
-        {
-            perror("Cannot open /dev/dsp");
-            exit(1);
-        }
-
-        format = AFMT_S16_NE;
-        if (ioctl(audio_fd, SNDCTL_DSP_SETFMT, &format) == -1)
-        {
-            perror("SNDCTL_DSP_SETFMT");
-            close(audio_fd);
-            exit(1);
-        }
-
-        stereo = 0;
-        if (*channels == 2)
-            stereo = 1;
-        if (ioctl(audio_fd, SNDCTL_DSP_STEREO, &stereo) == -1)
-        {
-            perror("SNDCTL_DSP_STEREO");
-            close(audio_fd);
-            exit(1);
-        }
-        if (stereo != 0)
-        {
-            if (*channels == 1)
-                fprintf(stderr, "Cannot set mono mode, will decode in stereo\n");
-            *channels = 2;
-        }
-
-        if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &rate) == -1)
-        {
-            perror("SNDCTL_DSP_SPEED");
-            close(audio_fd);
-            exit(1);
-        }
-        fout = fdopen(audio_fd, "w");
-#elif defined HAVE_SYS_AUDIOIO_H
-        audio_info_t info;
-        int audio_fd;
-
-        audio_fd = open("/dev/audio", O_WRONLY);
-        if (audio_fd<0)
-        {
-            perror("Cannot open /dev/audio");
-            exit(1);
-        }
-
-        AUDIO_INITINFO(&info);
-#ifdef AUMODE_PLAY    /* NetBSD/OpenBSD */
-        info.mode = AUMODE_PLAY;
-#endif
-        info.play.encoding = AUDIO_ENCODING_SLINEAR;
-        info.play.precision = 16;
-        info.play.sample_rate = rate;
-        info.play.channels = *channels;
-
-        if (ioctl(audio_fd, AUDIO_SETINFO, &info) < 0)
-        {
-            perror("AUDIO_SETINFO");
-            exit(1);
-        }
-        fout = fdopen(audio_fd, "w");
-#elif defined WIN32 || defined _WIN32
-        {
-            unsigned int speex_channels = *channels;
-            if (Set_WIN_Params(INVALID_FILEDESC, rate, SAMPLE_SIZE, speex_channels))
-            {
-                fprintf(stderr, "Can't access %s\n", "WAVE OUT");
-                exit(1);
-            }
-        }
-#else
-        fprintf(stderr, "No soundcard support\n");
-        exit(1);
-#endif
-    }
-    else {
-        if (strcmp(outFile, "-") == 0)
-        {
-#if defined WIN32 || defined _WIN32
-            _setmode(_fileno(stdout), _O_BINARY);
-#elif defined OS2
-            _fsetmode(stdout, "b");
-#endif
-            fout = stdout;
-        }
-        else
-        {
-            fout = fopen(outFile, "wb");
-            if (!fout)
-            {
-                perror(outFile);
-                exit(1);
-            }
-            if (strcmp(outFile + strlen(outFile) - 4, ".wav") == 0 || strcmp(outFile + strlen(outFile) - 4, ".WAV") == 0)
-                write_wav_header(fout, rate, *channels, 0, 0);
-        }
-    }
-    return fout;
 }
