@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
+using CommandLine;
 
 namespace speexcmd
 {
@@ -11,7 +12,14 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
-            //EncodeFromFile();
+            var options = new Options();
+            if (CommandLine.Parser.Default.ParseArguments(args, options) == false)
+            {
+                Console.WriteLine("Arguments do not parse correctly");
+            }
+
+            //EncodeFromFile(options.Quality);
+            EncodeFromFile();
             Decode();
 
             Console.WriteLine("Finished!");
@@ -45,6 +53,21 @@ namespace speexcmd
             Speex speex = new Speex();
             bool isSuccess = speex.Decode("agmu1.spx", "amug1.raw");
             Console.WriteLine("Decoded {0}", isSuccess ? "Success" : "Failed");
+        }
+    }
+
+    class Options
+    {
+        [Option('q', "quality", Required = false, HelpText = "The quality that goes from 1 to 10", DefaultValue = 1)]
+        public int Quality { get; set; }
+
+        //[ParserState]
+        //public IParserState LastParserState { get; set; }
+
+        [HelpOption]
+        public string GetUsage()
+        {
+            return "XXX.";
         }
     }
 }
