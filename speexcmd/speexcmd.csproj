@@ -66,7 +66,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="cc_codecs32_speex.dll">
+    <Content Include="..\refs\cc_codecs32_speex.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

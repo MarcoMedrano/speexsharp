@@ -85,7 +85,7 @@ namespace speexcmd
 
                 inputFile = args[args.Length - 2];
                 outputFile = args[args.Length - 1];
-                bool isEncoding = inputFile.ToLowerInvariant().EndsWith(".spx");
+                bool isEncoding = outputFile.ToLowerInvariant().EndsWith(".spx");
 
                 string stString = "mono";
                 if (channels == 2)
@@ -94,9 +94,12 @@ namespace speexcmd
                 Console.Write("*************{0}************** \n", isEncoding ? "ENCODING" : "DECODING");
                 Console.Write("Input File: " + inputFile + " \n");
                 Console.Write("Output File: " + outputFile + " \n");
-                Console.Write("channels : " + stString + " \n");
-                Console.Write("Quality : " + quality + " \n");
-                Console.Write("Band Mode : " + bMString + " \n");
+                if (isEncoding)
+                {
+                    Console.Write("channels : " + stString + " \n");
+                    Console.Write("Quality : " + quality + " \n");
+                    Console.Write("Band Mode : " + bMString + " \n"); 
+                }
                 Console.Write("************************************** \n");
                 if (help)
                 {
@@ -116,7 +119,7 @@ namespace speexcmd
                 }
                 else
                 {
-                    Decode(inputFile, outputFile, channels);
+                    Decode(inputFile, outputFile);
                 }
             }
             else
@@ -144,7 +147,7 @@ namespace speexcmd
             Console.Write(" --ch n    File channels (1-2)\n\n");
 
             Console.Write("FOR DECODING\n");
-            Console.Write("Decodes input_file spx files to raw files.\n");
+            Console.Write("Decodes input_file spx file to raw file.\n");
             Console.Write("\n");
             Console.Write("input_file can  be: filename.spx      Speex file\n");
             Console.Write("output_file can be: filename.raw      Raw PCM file\n");
@@ -155,6 +158,7 @@ namespace speexcmd
             Console.Write("********************************\n");
             Console.Write(" -ft      Full Test : input_file is a spx file, and output return a new raw file and a new spx file \n");
         }
+
         private static void Encode()
         {
             Speex speex = new Speex();
@@ -184,10 +188,10 @@ namespace speexcmd
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
-        private static void Decode(string spxFileName ,string rawFileName, int channels)
+        private static void Decode(string spxFileName ,string rawFileName)
         {
             Speex speex = new Speex();
-            bool isSuccess = speex.Decode(spxFileName, rawFileName, channels);
+            bool isSuccess = speex.Decode(spxFileName, rawFileName);
             Console.WriteLine("Decoded {0}", isSuccess ? "Success" : "Failed");
         }
     }
