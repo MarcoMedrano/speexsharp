@@ -79,11 +79,11 @@ namespace speexcmd
         /// </ Summary>         
         /// <param name = "inFileName" >  input file </ param> 
         /// <param name = "outFileName" >  output file </ param> 
-        public bool Decode(string inFileName, string outFileName)
+        public bool Decode(string inFileName, string outFileName, int channels)
         {
             IntPtr pointerToBytes;
             int size;
-            bool isSuccess = SpeexCommons.DecodeSpeex(inFileName, out pointerToBytes, out size);
+            bool isSuccess = SpeexCommons.DecodeSpeex(inFileName, out pointerToBytes, out size, channels);
 
             var destination = new byte[size];
             Marshal.Copy(pointerToBytes, destination, 0, size);

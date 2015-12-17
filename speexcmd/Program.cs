@@ -85,10 +85,13 @@ namespace speexcmd
 
                 inputFile = args[args.Length - 2];
                 outputFile = args[args.Length - 1];
+                bool isEncoding = inputFile.ToLowerInvariant().EndsWith(".spx");
+
                 string stString = "mono";
                 if (channels == 2)
                     stString = "stereo";
                 Console.Write("************************************** \n");
+                Console.Write("*************{0}************** \n", isEncoding ? "ENCODING" : "DECODING");
                 Console.Write("Input File: " + inputFile + " \n");
                 Console.Write("Output File: " + outputFile + " \n");
                 Console.Write("channels : " + stString + " \n");
@@ -99,7 +102,7 @@ namespace speexcmd
                 {
                     EncodeHelp();
                 }
-                else
+                if(isEncoding)
                 {
                     if (fullTest)
                     {
@@ -111,7 +114,10 @@ namespace speexcmd
                     }
 
                 }
-                //Decode();
+                else
+                {
+                    Decode(inputFile, outputFile, channels);
+                }
             }
             else
             {
@@ -125,18 +131,26 @@ namespace speexcmd
         {
             Console.Write("Usage: speexcmd [options] input_file output_file\n");
             Console.Write("\n");
+            Console.Write("FOR ENCODING\n");
             Console.Write("Encodes input_file using Speex. It can read raw files.\n");
             Console.Write("\n");
-            Console.Write("input_file can be:\n");
-            Console.Write("  filename.raw        Raw PCM file\n");
-            Console.Write("output_file can be:\n");
-            Console.Write("  filename.spx      Speex file\n");
+            Console.Write("input_file can  be: filename.raw      Raw PCM file\n");
+            Console.Write("output_file can be: filename.spx      Speex file\n");
             Console.Write("Options:\n");
             Console.Write(" -n       Narrowband (8 kHz) input file\n");
             Console.Write(" -w       Wideband (16 kHz) input file\n");
             Console.Write(" -u      \"Ultra-wideband\" (32 kHz) input file\n");
             Console.Write(" --q n    Encoding quality (0-10)\n");
-            Console.Write(" --ch n    File channels (1-2)\n");
+            Console.Write(" --ch n    File channels (1-2)\n\n");
+
+            Console.Write("FOR DECODING\n");
+            Console.Write("Decodes input_file spx files to raw files.\n");
+            Console.Write("\n");
+            Console.Write("input_file can  be: filename.spx      Speex file\n");
+            Console.Write("output_file can be: filename.raw      Raw PCM file\n");
+            Console.Write("Options:\n");
+            Console.Write(" --ch n    File channels (1-2)\n\n");
+
             Console.Write(" -h       Help\n");
             Console.Write("********************************\n");
             Console.Write(" -ft      Full Test : input_file is a spx file, and output return a new raw file and a new spx file \n");
@@ -170,10 +184,10 @@ namespace speexcmd
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
-        private static void Decode(string spxFileName ,string rawFileName)
+        private static void Decode(string spxFileName ,string rawFileName, int channels)
         {
             Speex speex = new Speex();
-            bool isSuccess = speex.Decode(spxFileName, rawFileName);
+            bool isSuccess = speex.Decode(spxFileName, rawFileName, channels);
             Console.WriteLine("Decoded {0}", isSuccess ? "Success" : "Failed");
         }
     }
