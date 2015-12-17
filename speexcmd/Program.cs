@@ -24,7 +24,9 @@ namespace speexcmd
                 bool help = false, fullTest = false;
                 String inputFile, outputFile;
                 int quality = 5;
+                int channels = 1;
                 int bandMode = BandMode.Narrow;
+                string bMString = "Narrow";
 
                 for (int i = 0; i < args.Length; i++) // Loop through array
                 {
@@ -36,12 +38,15 @@ namespace speexcmd
                             break;
                         case "-n":
                             bandMode = BandMode.Narrow;
+                            bMString = "Narrow";
                             break;
                         case "-w":
                             bandMode = BandMode.Wide;
+                            bMString = "Wide";
                             break;
                         case "-u":
                             bandMode = BandMode.UltraWide;
+                            bMString = "UltraWide";
                             break;
                         case "-ft":
                             fullTest = true;
@@ -60,14 +65,36 @@ namespace speexcmd
                                 }
                             }
                             break;
+                        case "--ch":
+                            if (args.Length >= i + 1)
+                            {
+                                try
+                                {
+                                    channels = Int32.Parse(args[i + 1]);
+                                    if (channels > 2) { channels = 1; }
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.Write("Usage: channels parameter missing, 1 channel is By default\n");
+                                    channels = 1;
+                                }
+                            }
+                            break;
                     }
                 }
 
                 inputFile = args[args.Length - 2];
                 outputFile = args[args.Length - 1];
-
+                string stString = "mono";
+                if (channels == 2)
+                    stString = "stereo";
+                Console.Write("************************************** \n");
                 Console.Write("Input File: " + inputFile + " \n");
                 Console.Write("Output File: " + outputFile + " \n");
+                Console.Write("channels : " + stString + " \n");
+                Console.Write("Quality : " + quality + " \n");
+                Console.Write("Band Mode : " + bMString + " \n");
+                Console.Write("************************************** \n");
                 if (help)
                 {
                     EncodeHelp();
@@ -76,11 +103,11 @@ namespace speexcmd
                 {
                     if (fullTest)
                     {
-                        TestEncodeFromBuffer(inputFile, outputFile, quality, bandMode);
+                        TestEncodeFromBuffer(inputFile, outputFile, quality, bandMode, channels);
                     }
                     else
                     {
-                        EncodeFromFile(inputFile, outputFile, quality, bandMode);
+                        EncodeFromFile(inputFile, outputFile, quality, bandMode, channels);
                     }
 
                 }
@@ -109,6 +136,7 @@ namespace speexcmd
             Console.Write(" -w       Wideband (16 kHz) input file\n");
             Console.Write(" -u      \"Ultra-wideband\" (32 kHz) input file\n");
             Console.Write(" --q n    Encoding quality (0-10)\n");
+            Console.Write(" --ch n    File channels (1-2)\n");
             Console.Write(" -h       Help\n");
             Console.Write("********************************\n");
             Console.Write(" -ft      Full Test : input_file is a spx file, and output return a new raw file and a new spx file \n");
@@ -120,25 +148,25 @@ namespace speexcmd
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
-        private static void EncodeFromFile(String input, String output, int quality, int bandMode)
+        private static void EncodeFromFile(String input, String output, int quality, int bandMode, int channels)
         {
             Speex speex = new Speex();
-            bool response = speex.EncodeFromFile(input, output, quality, bandMode, 1);
+            bool response = speex.EncodeFromFile(input, output, quality, bandMode, channels);
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
-        private static void EncodeFromBuffer(String output, int quality, int bandMode, byte[] buffer, int buferSize)
+        private static void EncodeFromBuffer(String output, int quality, int bandMode, byte[] buffer, int buferSize, int channels)
         {
             Speex speex = new Speex();
-            bool response = speex.EncodeFromBuffer(output, quality, bandMode, 1, buffer, buferSize);
+            bool response = speex.EncodeFromBuffer(output, quality, bandMode, channels, buffer, buferSize);
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
-        private static void TestEncodeFromBuffer(String input, String output, int quality, int bandMode)
+        private static void TestEncodeFromBuffer(String input, String output, int quality, int bandMode, int channels)
         {
             byte[] tempBuffer = new byte[3];
             Speex speex = new Speex();
-            bool response = speex.TestEncodeFromBuffer(input, output, quality, bandMode, 1);
+            bool response = speex.TestEncodeFromBuffer(input, output, quality, bandMode, channels);
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
