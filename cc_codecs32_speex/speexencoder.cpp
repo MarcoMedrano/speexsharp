@@ -28,6 +28,7 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 {
 	fprintf(stderr, "SpeexEncoder: Initialize\n");
 	SpeexHeader header;
+	fprintf(stderr, "modeInput: %s\n", modeInput);
 	if (modeInput != NULL){
 		if (strcmp(modeInput, "narrowband") == 0)
 		{
@@ -50,7 +51,10 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	snprintf(vendor_string, sizeof(vendor_string), "Encoded with Speex %s", speex_version);
 
 	comment_init(&comments, &comments_length, vendor_string);
-
+	comment_add(&comments, &comments_length, "TITLE=", (char*) filename);
+	comment_add(&comments, &comments_length, "AUTHOR=", "uptivity");
+	comment_add(&comments, &comments_length, "FormatType=", "speex");
+	
 	/*Initialize Ogg stream struct*/
 	srand(time(NULL));
 	if (ogg_stream_init(&os, rand()) == -1)
@@ -63,6 +67,7 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
    {
 	   /* By default, use narrowband/8 kHz */
 	   modeID = SPEEX_MODEID_NB;
+	   rate = 8000;
    }
 	if (modeID == SPEEX_MODEID_NB)
 		rate = 8000;
@@ -115,6 +120,8 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	   op.e_o_s = 0;
 	   op.granulepos = 0;
 	   op.packetno = 0;
+
+	   // submit the packet to the ogg streaming layer
 	   ogg_stream_packetin(&os, &op);
 	   free(op.packet);
 

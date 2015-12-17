@@ -39,9 +39,9 @@ namespace speexcmd
         /// </ Summary>         
         /// <param name = "inFile" >  input file </ param> 
         /// <param name = "outFile" >  output file </ param> 
-        public bool EncodeFromFile(string inFile,  string outFile,int qualityIn)
+        public bool EncodeFromFile(string inFile, string outFile, int qualityIn, int bandMode, int channels)
         {
-            return SpeexCommons.EncodeSpeexFromFile(inFile, outFile, qualityIn);
+            return SpeexCommons.EncodeSpeexFromFile(inFile, outFile, qualityIn, bandMode, channels);
         }
 
         /// <summary> 
@@ -49,10 +49,29 @@ namespace speexcmd
         /// </ Summary>         
         /// <param name = "inFile" >  input file </ param> 
         /// <param name = "outFile" >  output file </ param> 
-        public bool EncodeFromBuffer(string outFile, int qualityIn, byte[] buffer, int buferSize)
+        public bool EncodeFromBuffer(string outFile, int qualityIn, int bandMode, int channels, byte[] buffer, int buferSize)
         {
-            return SpeexCommons.EncodeSpeexFromBuffer(outFile, qualityIn, buffer, buferSize);
+            return SpeexCommons.EncodeSpeexFromBuffer(outFile, qualityIn, bandMode, channels, buffer, buferSize);
+        }
 
+        /// <summary> 
+        /// Full Test for Decode/Encoding audio data will be collected.
+        /// </ Summary>         
+        /// <param name = "inFile" >  input file </ param> 
+        /// <param name = "outFile" >  output file </ param> 
+        public bool TestEncodeFromBuffer(string spxInFileName, string outFileName, int qualityIn, int bandMode, int channels)
+        {
+            IntPtr pointerToBytes;
+            int size;
+            bool isSuccess = SpeexCommons.DecodeSpeex(spxInFileName, out pointerToBytes, out size);
+
+            var destination = new byte[size];
+            Marshal.Copy(pointerToBytes, destination, 0, size);
+            using (var fileStream = new FileStream(outFileName, FileMode.Create, FileAccess.Write))
+            {
+                fileStream.Write(destination, 0, destination.Length);
+            }
+            return SpeexCommons.EncodeSpeexFromBuffer(outFileName + ".spx", qualityIn, bandMode, channels, destination, destination.Length);
         }
 
         /// <summary> 

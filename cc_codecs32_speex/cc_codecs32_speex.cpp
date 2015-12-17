@@ -11,10 +11,10 @@
 #include <io.h>
 #include <fcntl.h>
 #include "skeleton.h"
-
 #include "speexencoder.h";
 #include "SpeexDecoder.h"
 
+using namespace std;
 
 static char * ReadAllBytes(const char * filename, size_t * buffer_size)
 {
@@ -41,27 +41,33 @@ static char * ReadAllBytes(const char * filename, size_t * buffer_size)
 	// terminate
 	fclose(pFile);
 	return buffer;
-	}
+}
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     return TRUE;
 }
 
-bool  __stdcall EncodeSpeexFromBuffer(const  char *outFilename, int qualityIn, char * buffer, size_t buffer_size)
+bool  __stdcall EncodeSpeexFromBuffer(const  char *outFilename, int qualityIn, int bandMode, int channels, char * buffer, size_t buffer_size)
 {
 	SpeexEncoder* encoder = new SpeexEncoder();
-	encoder->Initialize(outFilename, NULL, 1);
+	char * modeInput = "narrowband";
+	if (bandMode == 1){ modeInput = "wideband"; }
+	else if (bandMode == 2){ modeInput = "ultra-wideband"; }
+	encoder->Initialize(outFilename, modeInput, channels);
 	encoder->SetQuality(qualityIn);
 	encoder->EncodeFromBuffer(buffer, buffer_size);
 	encoder->Close();
 	return 0;
 }
 
-bool  __stdcall EncodeSpeexFromFile(const char *inFilename, const char *outFilename, int qualityIn)
+bool  __stdcall EncodeSpeexFromFile(const char *inFilename, const char *outFilename, int qualityIn, int bandMode, int channels)
 {
 	SpeexEncoder* encoder = new SpeexEncoder();
-	encoder->Initialize(outFilename, NULL, 1);
+	char * modeInput = "narrowband";
+	if (bandMode == 1){ modeInput = "wideband"; }
+	else if (bandMode == 2){ modeInput = "ultra-wideband"; }
+	encoder->Initialize(outFilename, modeInput, channels);
 	encoder->SetQuality(qualityIn);
 	FILE *fin = fopen(inFilename, "rb");
 	if (!fin)
