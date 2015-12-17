@@ -71,6 +71,7 @@ namespace speexcmd
                                 try
                                 {
                                     channels = Int32.Parse(args[i + 1]);
+                                    if (channels > 2) { channels = 1; }
                                 }
                                 catch (Exception e)
                                 {
