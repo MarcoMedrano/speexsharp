@@ -142,10 +142,10 @@ namespace speexcmd
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
-        private static void Decode()
+        private static void Decode(string spxFileName ,string rawFileName)
         {
             Speex speex = new Speex();
-            bool isSuccess = speex.Decode("agmu1.spx", "amug1.raw");
+            bool isSuccess = speex.Decode(spxFileName, rawFileName);
             Console.WriteLine("Decoded {0}", isSuccess ? "Success" : "Failed");
         }
     }
