@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using CallCopy.Media.Audio;
-using CommandLine;
 
 namespace speexcmd
 {
@@ -13,12 +12,6 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
-            var options = new Options();
-            if (CommandLine.Parser.Default.ParseArguments(args, options) == false)
-            {
-                Console.WriteLine("Arguments do not parse correctly");
-            }
-
             if (args.Length >= 2)
             {
                 bool help = false, fullTest = false;
@@ -193,22 +186,6 @@ namespace speexcmd
             Speex speex = new Speex();
             bool isSuccess = speex.Decode(spxFileName, rawFileName);
             Console.WriteLine("Decoded {0}", isSuccess ? "Success" : "Failed");
-        }
-    }
-
-
-    class Options
-    {
-        [Option('q', "quality", Required = false, HelpText = "The quality that goes from 1 to 10", DefaultValue = 1)]
-        public int Quality { get; set; }
-
-        //[ParserState]
-        //public IParserState LastParserState { get; set; }
-
-        [HelpOption]
-        public string GetUsage()
-        {
-            return "XXX.";
         }
     }
 }
