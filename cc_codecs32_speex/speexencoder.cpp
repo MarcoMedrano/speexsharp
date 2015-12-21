@@ -16,7 +16,6 @@ SpeexEncoder::SpeexEncoder()
 	bytes_written = 0;
 	eos = 0;
 	cumul_bits = 0;
-	enc_frames = 0;
 	preprocess = NULL;
 	lookahead = 0;
 	closed = false;
@@ -194,6 +193,8 @@ int SpeexEncoder::EncodeFromFile(FILE *fin)
 		eos = 1;
 	total_samples += nb_samples;
 	nb_encoded = -lookahead;
+
+	
 	/*Main encoding loop (one frame per iteration)*/
 	while (!eos || total_samples > nb_encoded)
 	{
@@ -237,7 +238,7 @@ int SpeexEncoder::EncodeFromFile(FILE *fin)
 		op.granulepos = (id + 1)*frame_size - lookahead;
 		if (op.granulepos > total_samples)
 			op.granulepos = total_samples;
-		/*printf ("granulepos: %d %d %d %d %d %d\n", (int)op.granulepos, id, nframes, lookahead, 5, 6);*/
+		//printf("granulepos: %d %d %d %d %d %d\n", (int)op.granulepos, id, 2 + id / nframes, lookahead, 5, 6);
 		op.packetno = 2 + id / nframes;
 		ogg_stream_packetin(&os, &op);
 
@@ -287,7 +288,11 @@ int SpeexEncoder::EncodeFromFile(FILE *fin)
 		else
 			bytes_written += ret;
 	}
-
+	fprintf(stderr, "total_samples: %i\n", total_samples);
+	fprintf(stderr, "id: %i\n", id);
+	fprintf(stderr, "frame_size: %i\n", frame_size);
+	fprintf(stderr, "Duration: %d\n", frame_size *id / rate);
+	
 	fclose(fin);
 
 	return 0;

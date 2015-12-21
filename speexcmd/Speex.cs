@@ -63,7 +63,7 @@ namespace speexcmd
         {
             IntPtr pointerToBytes;
             int size;
-            bool isSuccess = SpeexCommons.DecodeSpeex(spxInFileName, out pointerToBytes, out size);
+            bool isSuccess = SpeexCommons.DecodeSpeex(spxInFileName, out pointerToBytes, out size); 
 
             var destination = new byte[size];
             Marshal.Copy(pointerToBytes, destination, 0, size);

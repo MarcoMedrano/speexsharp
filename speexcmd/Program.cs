@@ -20,7 +20,7 @@ namespace speexcmd
                 int channels = 1;
                 int bandMode = BandMode.Narrow;
                 string bMString = "Narrow";
-
+                bool isEncoding = true;
                 for (int i = 0; i < args.Length; i++) // Loop through array
                 {
                     string argument = args[i];
@@ -43,6 +43,7 @@ namespace speexcmd
                             break;
                         case "-ft":
                             fullTest = true;
+                            isEncoding = true;
                             break;
                         case "--q":
                             if (args.Length >= i + 1)
@@ -78,7 +79,7 @@ namespace speexcmd
 
                 inputFile = args[args.Length - 2];
                 outputFile = args[args.Length - 1];
-                bool isEncoding = outputFile.ToLowerInvariant().EndsWith(".spx");
+                if (!fullTest) isEncoding = outputFile.ToLowerInvariant().EndsWith(".spx");
 
                 string stString = "mono";
                 if (channels == 2)
