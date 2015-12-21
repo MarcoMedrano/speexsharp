@@ -56,7 +56,7 @@ private:
 	char *comments;
 	int comments_length;
 	int eos;
-	double cumul_bits, enc_frames;
+	double cumul_bits;
 	SpeexPreprocessState *preprocess;
 	spx_int32_t lookahead;
 
