@@ -23,14 +23,15 @@ namespace speexcmd
 
         }
 
+
         /// <summary> 
         /// Encoding audio data will be collected.
         /// </ Summary>         
         /// <param name = "inFile" >  input file </ param> 
         /// <param name = "outFile" >  output file </ param> 
-        public bool Encode(string inFile, int qualityIn, string outFile)
+        public bool EncodeFromFile(string inFile, string outFile, int qualityIn, int bandMode, int channels, int pcmRate)
         {
-            return SpeexCommons.EncodeSpeex(inFile, qualityIn, outFile);
+            return SpeexCommons.EncodeSpeexFromFile(inFile, outFile, qualityIn, bandMode, channels, pcmRate);
         }
 
 
@@ -41,9 +42,9 @@ namespace speexcmd
         /// <param name = "outFile" >  output file </ param> 
         public bool EncodeFromFile(string inFile, string outFile, int qualityIn, int bandMode, int channels)
         {
-            return SpeexCommons.EncodeSpeexFromFile(inFile, outFile, qualityIn, bandMode, channels);
+            return SpeexCommons.EncodeSpeexFromFile(inFile, outFile, qualityIn, bandMode, channels, -1);
         }
-
+        
         /// <summary> 
         /// Encoding audio data will be collected.
         /// </ Summary>         
@@ -51,9 +52,18 @@ namespace speexcmd
         /// <param name = "outFile" >  output file </ param> 
         public bool EncodeFromBuffer(string outFile, int qualityIn, int bandMode, int channels, byte[] buffer, int buferSize)
         {
-            return SpeexCommons.EncodeSpeexFromBuffer(outFile, qualityIn, bandMode, channels, buffer, buferSize);
+            return SpeexCommons.EncodeSpeexFromBuffer(outFile, qualityIn, bandMode, channels, buffer, buferSize,-1);
         }
-
+        
+        /// <summary> 
+        /// Encoding audio data will be collected.
+        /// </ Summary>         
+        /// <param name = "inFile" >  input file </ param> 
+        /// <param name = "outFile" >  output file </ param> 
+        public bool EncodeFromBuffer(string outFile, int qualityIn, int bandMode, int channels, byte[] buffer, int buferSize, int pcmRate)
+        {
+            return SpeexCommons.EncodeSpeexFromBuffer(outFile, qualityIn, bandMode, channels, buffer, buferSize, pcmRate);
+        }
         /// <summary> 
         /// Full Test for Decode/Encoding audio data will be collected.
         /// </ Summary>         
@@ -71,7 +81,7 @@ namespace speexcmd
             {
                 fileStream.Write(destination, 0, destination.Length);
             }
-            return SpeexCommons.EncodeSpeexFromBuffer(outFileName + ".spx", qualityIn, bandMode, channels, destination, destination.Length);
+            return SpeexCommons.EncodeSpeexFromBuffer(outFileName + ".spx", qualityIn, bandMode, channels, destination, destination.Length,-1);
         }
 
         /// <summary> 

@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+void comment_init(char **comments, int* length, char *vendor_string);
+void comment_add(char **comments, int* length, char *tag, char *val);
 
 SpeexEncoder::SpeexEncoder()
 {
@@ -15,16 +17,21 @@ SpeexEncoder::SpeexEncoder()
 	complexity = 3;
 	bytes_written = 0;
 	eos = 0;
-	cumul_bits = 0;
 	preprocess = NULL;
 	lookahead = 0;
 	closed = false;
 
 }
-
-
 int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels)
 {
+
+	return Initialize(filename, modeInput, channels, -1);
+}
+
+int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels, int pcmRate)
+{
+	char *comments;
+	int comments_length;
 	fprintf(stderr, "SpeexEncoder: Initialize\n");
 	SpeexHeader header;
 	fprintf(stderr, "modeInput: %s\n", modeInput);
@@ -50,10 +57,9 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	snprintf(vendor_string, sizeof(vendor_string), "Encoded with Speex %s", speex_version);
 
 	comment_init(&comments, &comments_length, vendor_string);
-	comment_add(&comments, &comments_length, "TITLE=", (char*) filename);
+	comment_add(&comments, &comments_length, "TITLE=", "ssss");
 	comment_add(&comments, &comments_length, "AUTHOR=", "uptivity");
-	comment_add(&comments, &comments_length, "FormatType=", "speex");
-	
+	comment_add(&comments, &comments_length, "FormatType=", vendor_string);
 	/*Initialize Ogg stream struct*/
 	srand(time(NULL));
 	if (ogg_stream_init(&os, rand()) == -1)
@@ -61,19 +67,23 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 		fprintf(stderr, "Error: stream init failed\n");
 		exit(1);
 	}
-	
+	rate = pcmRate;
    if (modeID == -1 )
    {
 	   /* By default, use narrowband/8 kHz */
 	   modeID = SPEEX_MODEID_NB;
-	   rate = 8000;
+	   if (pcmRate < 0){
+		   rate = 8000;
+	   }
    }
-	if (modeID == SPEEX_MODEID_NB)
-		rate = 8000;
-	else if (modeID == SPEEX_MODEID_WB)
-		rate = 16000;
-	else if (modeID == SPEEX_MODEID_UWB)
-		rate = 32000;
+   if (pcmRate < 0){
+	   if (modeID == SPEEX_MODEID_NB)
+	   	rate = 8000;
+	   else if (modeID == SPEEX_MODEID_WB)
+	   	rate = 16000;
+	   else if (modeID == SPEEX_MODEID_UWB)
+	   	rate = 32000;
+   }
 
    if (!mode)
 	   mode = speex_lib_get_mode(modeID);
@@ -275,6 +285,7 @@ int SpeexEncoder::EncodeFromFile(FILE *fin)
 		op.packetno = 2 + id / nframes;
 		ogg_stream_packetin(&os, &op);
 	}
+
 	/*Flush all pages left to be written*/
 	while (ogg_stream_flush(&os, &og))
 	{
@@ -288,10 +299,12 @@ int SpeexEncoder::EncodeFromFile(FILE *fin)
 		else
 			bytes_written += ret;
 	}
-	fprintf(stderr, "total_samples: %i\n", total_samples);
-	fprintf(stderr, "id: %i\n", id);
-	fprintf(stderr, "frame_size: %i\n", frame_size);
+
 	fprintf(stderr, "Duration: %d\n", frame_size *id / rate);
+	int minutes = (int)(frame_size *id / rate)/60;
+	int seconds = (frame_size *id / rate) - (minutes * 60);
+	fprintf(stderr, "Duration Minutes: %d\n", minutes);
+	fprintf(stderr, "Duration Seconds: %d\n", seconds);
 	
 	fclose(fin);
 

@@ -48,59 +48,36 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
     return TRUE;
 }
 
-bool  __stdcall EncodeSpeexFromBuffer(const  char *outFilename, int qualityIn, int bandMode, int channels, char * buffer, size_t buffer_size)
+bool  __stdcall EncodeSpeexFromBuffer(const  char *outFilename, int qualityIn, int bandMode, int channels, char * buffer, size_t buffer_size, int pcmRate)
 {
 	SpeexEncoder* encoder = new SpeexEncoder();
 	char * modeInput = "narrowband";
 	if (bandMode == 1){ modeInput = "wideband"; }
 	else if (bandMode == 2){ modeInput = "ultra-wideband"; }
-	encoder->Initialize(outFilename, modeInput, channels);
+	encoder->Initialize(outFilename, modeInput, channels, pcmRate);
 	encoder->SetQuality(qualityIn);
 	encoder->EncodeFromBuffer(buffer, buffer_size);
 	encoder->Close();
 	return 0;
 }
 
-bool  __stdcall EncodeSpeexFromFile(const char *inFilename, const char *outFilename, int qualityIn, int bandMode, int channels)
+bool  __stdcall EncodeSpeexFromFile(const char *inFilename, const char *outFilename, int qualityIn, int bandMode, int channels, int pcmRate)
 {
 	SpeexEncoder* encoder = new SpeexEncoder();
 	char * modeInput = "narrowband";
 	if (bandMode == 1){ modeInput = "wideband"; }
 	else if (bandMode == 2){ modeInput = "ultra-wideband"; }
-	encoder->Initialize(outFilename, modeInput, channels);
+	encoder->Initialize(outFilename, modeInput, channels, pcmRate);
 	encoder->SetQuality(qualityIn);
 	FILE *fin = fopen(inFilename, "rb");
 	if (!fin)
-		   {
+	{
 		perror(inFilename);
-			   exit(1);
-		   }
+		exit(1);
+	}
 	encoder->EncodeFromFile(fin);
 	encoder->Close();
 	return 0;
-}
-
-bool  __stdcall EncodeSpeex(const char *inFile, int qualityIn, const   char *outFile)
-{
-	SpeexEncoder* encoder = new SpeexEncoder();
-	encoder->Initialize(outFile, NULL, 1);
-	encoder->SetQuality(qualityIn);
-
-	//FILE *fin;
-	//char* inputfilename = "gate10.decode.raw";
-	//fin = fopen(inputfilename, "rb");
-	//if (!fin)
-	//{
-	//	perror(inputfilename);
-	//	exit(1);
-	//}
-
-	size_t  buffer_size = 0;
-	char  *pChars = ReadAllBytes(inFile, &buffer_size);
-	encoder->EncodeFromBuffer(pChars, buffer_size);
-	//encoder->EncodeFromFile(fin);
-	encoder->Close();
-   return 0;
 }
 
 extern  "C" __declspec(dllexport) bool __stdcall DecodeSpeex(const char *inFileName, char** outBuffer, int* outBufferSize)

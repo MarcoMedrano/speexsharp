@@ -53,10 +53,7 @@ private:
 	spx_int32_t complexity;
 	const char* speex_version;
 	char vendor_string[64];
-	char *comments;
-	int comments_length;
 	int eos;
-	double cumul_bits;
 	SpeexPreprocessState *preprocess;
 	spx_int32_t lookahead;
 
@@ -72,6 +69,7 @@ public:
 	~SpeexEncoder();
 
 	int				Initialize(const char* filename, char* modeInput, int channels);
+	int				Initialize(const char* filename, char* modeInput, int channels, int pcmRate);
 	int				EncodeFromBuffer(char *buffer, size_t buffer_size);
 	int				EncodeFromFile(FILE *fin);
 	void			Close();

@@ -25,6 +25,7 @@ namespace speexcmd
                 String inputFile, outputFile;
                 int quality = 5;
                 int channels = 1;
+                int rate = -1;
                 int bandMode = BandMode.Narrow;
                 string bMString = "Narrow";
                 bool isEncoding = true;
@@ -81,6 +82,21 @@ namespace speexcmd
                                 }
                             }
                             break;
+
+                        case "--rate":
+                            if (args.Length >= i + 1)
+                            {
+                                try
+                                {
+                                    rate = Int32.Parse(args[i + 1]);
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.Write("Usage: channels parameter missing, 1 channel is By default\n");
+                                    rate = -1;
+                                }
+                            }
+                            break;
                     }
                 }
 
@@ -114,7 +130,14 @@ namespace speexcmd
                     }
                     else
                     {
-                        EncodeFromFile(inputFile, outputFile, quality, bandMode, channels);
+                        if (rate > 0)
+                        {
+                            EncodeFromFile(inputFile, outputFile, quality, bandMode, channels, rate);
+                        }
+                        else
+                        {
+                            EncodeFromFile(inputFile, outputFile, quality, bandMode, channels);
+                        }
                     }
 
                 }
@@ -144,8 +167,9 @@ namespace speexcmd
             Console.Write(" -n       Narrowband (8 kHz) input file\n");
             Console.Write(" -w       Wideband (16 kHz) input file\n");
             Console.Write(" -u      \"Ultra-wideband\" (32 kHz) input file\n");
-            Console.Write(" --q n    Encoding quality (0-10)\n");
+            Console.Write(" --q n     Encoding quality (0-10)\n");
             Console.Write(" --ch n    File channels (1-2)\n\n");
+            Console.Write(" --rate n  Sampling rate for raw input");
 
             Console.Write("FOR DECODING\n");
             Console.Write("Decodes input_file spx file to raw file.\n");
@@ -160,17 +184,16 @@ namespace speexcmd
             Console.Write(" -ft      Full Test : input_file is a spx file, and output return a new raw file and a new spx file \n");
         }
 
-        private static void Encode()
-        {
-            Speex speex = new Speex();
-            bool response = speex.Encode("gate10.decode.raw", 10, "agmu1.spx");
-            Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
-        }
-
         private static void EncodeFromFile(String input, String output, int quality, int bandMode, int channels)
         {
             Speex speex = new Speex();
             bool response = speex.EncodeFromFile(input, output, quality, bandMode, channels);
+            Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
+        }
+        private static void EncodeFromFile(String input, String output, int quality, int bandMode, int channels,int rate)
+        {
+            Speex speex = new Speex();
+            bool response = speex.EncodeFromFile(input, output, quality, bandMode, channels, rate);
             Console.WriteLine("Encoded {0}", response ? "Success" : "Failed");
         }
 
