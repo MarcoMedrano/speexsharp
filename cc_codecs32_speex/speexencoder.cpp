@@ -2,7 +2,7 @@
 #include "speexencoder.h"
 #include <stdio.h>
 #include <string.h>
-
+#include <vector>
 void comment_init(char **comments, int* length, char *vendor_string);
 void comment_add(char **comments, int* length, char *tag, char *val);
 
@@ -59,7 +59,7 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	comment_init(&comments, &comments_length, vendor_string);
 	comment_add(&comments, &comments_length, "TITLE=", "ssss");
 	comment_add(&comments, &comments_length, "AUTHOR=", "uptivity");
-	comment_add(&comments, &comments_length, "FormatType=", vendor_string);
+	comment_add(&comments, &comments_length, "FORMATTYPE=", (char*)speex_version);
 	/*Initialize Ogg stream struct*/
 	srand(time(NULL));
 	if (ogg_stream_init(&os, rand()) == -1)
@@ -534,3 +534,90 @@ void SpeexEncoder::comment_add(char **comments, int* length, char *tag, char *va
 #undef readint
 #undef writeint
 
+
+
+void SpeexEncoder::encoder_init()
+{
+	int quality = 5;
+	modeID = SPEEX_MODEID_NB;
+	mode = speex_lib_get_mode(modeID);
+	encoder_state = speex_encoder_init(mode);
+	speex_encoder_ctl(encoder_state, SPEEX_SET_QUALITY, &quality);
+	speex_bits_init(&encoder_bits);
+}
+
+
+
+void SpeexEncoder::encoder_dispose()
+{
+	speex_encoder_destroy(encoder_state);
+	speex_bits_destroy(&encoder_bits);
+}
+
+int SpeexEncoder::encoder_encode(const   short   *data, char   **output)
+{
+	////fprintf(stderr, "encoder_encode1\n");
+	//for (int i = 0; i < FRAME_SIZE; i++){
+	//	encoder_input[i] = data[i];
+	//}
+
+
+	//speex_encode_int(encoder_state,(short*) encoder_input, &encoder_bits);
+
+	//speex_bits_insert_terminator(&encoder_bits);
+	////fprintf(stderr, "encoder_encode2\n");
+	//speex_bits_reset(&encoder_bits);
+	////fprintf(stderr, "encoder_encode3\n");
+	//speex_encode(encoder_state, encoder_input, &encoder_bits);
+	////fprintf(stderr, "encoder_encode4\n");
+	//char  outputBuffer[200];
+	//int size;
+	////fprintf(stderr, "encoder_encode4.5\n");
+	//size = speex_bits_write(&encoder_bits, outputBuffer, 200);
+	char *inFile;
+	FILE *fin;
+	short in[FRAME_SIZE];
+	inFile = "gate10.decode.raw";//argv[1];
+	fin = fopen(inFile, "r");
+	float input[FRAME_SIZE];
+	int i;
+	/*Initialization of the structure that holds the bits*/
+	speex_bits_init(&bits);
+	typedef std::vector<char> buffer_type;
+	buffer_type myData;
+	while (1)
+	{
+		/*Read a 16 bits/sample audio frame*/
+		fread(in, sizeof(short), FRAME_SIZE, fin);
+		if (feof(fin))
+			break;
+		/*Copy the 16 bits values to float so Speex can work on them*/
+		for (i = 0; i<FRAME_SIZE; i++)
+			input[i] = in[i];
+
+		/*Flush all the bits in the struct so we can encode a new frame*/
+		speex_bits_reset(&bits);
+
+		/*Encode the frame*/
+		speex_encode(encoder_state, input, &bits);
+		/*Copy the bits to an array of char that can be written*/
+		nbBytes = speex_bits_write(&bits, cbits, MAX_FRAME_BYTES);
+
+		/*Write the size of the frame first. This is what sampledec expects but
+		it's likely to be different in your own application*/
+		fwrite(&nbBytes, sizeof(int), 1, stdout);
+		/*Write the compressed data*/
+		fwrite(cbits, 1, nbBytes, stdout);
+		fprintf(stderr, "EncodeTest2 %i\n" , myData.size());
+		myData.insert(myData.end(), cbits, cbits + nbBytes);
+		
+	}
+
+	char *buffer = new char[myData.size()];
+	std::copy(myData.begin(), myData.end(), buffer);
+	fprintf(stderr, "EncodeTest2 %i\n", sizeof(buffer));
+	//fprintf(stderr, "encoder_encode5\n");
+	*output = buffer;
+	//fprintf(stderr, "encoder_encode6 %i\n", size);
+	return myData.size();
+}

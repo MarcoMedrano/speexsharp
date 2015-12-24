@@ -11,6 +11,7 @@ namespace speexcmd
 {
     public class Speex 
     {
+        private const int FrameSize = 160;
         /// <summary> 
         /// Initialize.
         /// </ Summary> 
@@ -21,6 +22,23 @@ namespace speexcmd
         public void Dispose()
         {
 
+        }
+
+        public byte[] Encode(byte[] data)
+        {
+
+
+
+            byte[] output = new byte[0];
+
+                IntPtr pointerToBytes;
+                int size =  SpeexCommons.EncodeTest(null, out pointerToBytes);
+
+                byte[] buffer = new byte[size];
+
+                Marshal.Copy(pointerToBytes, buffer, 0, buffer.Length);
+
+                return buffer;
         }
 
 

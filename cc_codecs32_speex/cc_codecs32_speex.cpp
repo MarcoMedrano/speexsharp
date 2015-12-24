@@ -48,6 +48,21 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
     return TRUE;
 }
 
+int  __stdcall EncodeTest(const short *data, char** outBuffer)
+{
+	SpeexEncoder* encoder = new SpeexEncoder();
+	int outBufferSize = 0;
+	//fprintf(stderr, "EncodeTest1\n");
+	encoder->encoder_init();
+	//fprintf(stderr, "EncodeTest2\n");
+	outBufferSize = encoder->encoder_encode(data, outBuffer);
+	//fprintf(stderr, "EncodeTest3 %i\n", outBufferSize);
+	encoder->encoder_dispose();
+	//fprintf(stderr, "EncodeTest4\n");
+	return outBufferSize;
+}
+
+
 bool  __stdcall EncodeSpeexFromBuffer(const  char *outFilename, int qualityIn, int bandMode, int channels, char * buffer, size_t buffer_size, int pcmRate)
 {
 	SpeexEncoder* encoder = new SpeexEncoder();

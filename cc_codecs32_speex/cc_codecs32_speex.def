@@ -4,4 +4,5 @@ DESCRIPTION 'Library for encoding/decoding speex files.'
 EXPORTS
 	EncodeSpeexFromBuffer
 	EncodeSpeexFromFile
+	 EncodeTest
 	DecodeSpeex

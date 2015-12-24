@@ -47,6 +47,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Speex.cs" />
     <Compile Include="SpeexCommons.cs" />
+    <Compile Include="Speex\AudioFileWriter.cs" />
+    <Compile Include="Speex\WaveWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -12,11 +12,11 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{582133E9-73A8-4EE0-9E28-418D08537E8C}</ProjectGuid>
-    <RootNamespace>NSpeex</RootNamespace>
-    <SccProjectName>SAK</SccProjectName>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccProvider>SAK</SccProvider>
+    <RootNamespace>Speex</RootNamespace>
+    <SccProjectName>Speex</SccProjectName>
+    <SccAuxPath>Speex</SccAuxPath>
+    <SccLocalPath>Speex</SccLocalPath>
+    <SccProvider>Speex</SccProvider>
     <Keyword>ManagedCProj</Keyword>
     <ProjectName>cc_codecs32_speex</ProjectName>
   </PropertyGroup>

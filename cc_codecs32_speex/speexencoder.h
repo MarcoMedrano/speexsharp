@@ -64,6 +64,12 @@ private:
 	int bytes_written, ret, result;
 
 	bool closed;
+
+#define FRAME_SIZE 160
+
+	float encoder_input[FRAME_SIZE];
+	void   *encoder_state;
+	SpeexBits encoder_bits;
 public:
 	SpeexEncoder();
 	~SpeexEncoder();
@@ -90,4 +96,7 @@ public:
 	void version_short();
 	void comment_init(char **comments, int* length, char *vendor_string);
 	void comment_add(char **comments, int* length, char *tag, char *val);
+	int encoder_encode(const   short   *data, char   **output);
+	void encoder_dispose();
+	void encoder_init();
 };

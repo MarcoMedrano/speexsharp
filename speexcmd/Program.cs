@@ -12,7 +12,16 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
-            if (args.Length >= 2)
+             WaveWriter wsw = new WaveWriter(1,1,4000,1,1);
+             byte[] silence = new byte[16];
+             wsw.Open("C:\\out.wav");
+             wsw.WriteHeader("Encoded with: agmu " );
+             Speex speex = new Speex();
+             byte[] buffer = File.ReadAllBytes("gate10.decode.raw");
+             byte[] speexBuffer = speex.Encode(buffer);
+             wsw.WritePacket(speexBuffer, 0, speexBuffer.Length);
+             wsw.Close();
+            if (args.Length >= 10)
             {
                 bool help = false, fullTest = false;
                 String inputFile, outputFile;
