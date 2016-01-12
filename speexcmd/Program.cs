@@ -12,16 +12,16 @@ namespace speexcmd
     {
         static void Main(string[] args)
         {
-             WaveWriter wsw = new WaveWriter(1,1,4000,1,1);
-             byte[] silence = new byte[16];
-             wsw.Open("C:\\out.wav");
-             wsw.WriteHeader("Encoded with: agmu " );
-             Speex speex = new Speex();
-             byte[] buffer = File.ReadAllBytes("gate10.decode.raw");
-             byte[] speexBuffer = speex.Encode(buffer);
-             wsw.WritePacket(speexBuffer, 0, speexBuffer.Length);
-             wsw.Close();
-            if (args.Length >= 10)
+             //WaveWriter wsw = new WaveWriter(1,1,4000,1,1);
+             //byte[] silence = new byte[16];
+             //wsw.Open("C:\\out.wav");
+             //wsw.WriteHeader("Encoded with: agmu " );
+             //Speex speex = new Speex();
+             //byte[] buffer = File.ReadAllBytes("gate10.decode.raw");
+             //byte[] speexBuffer = speex.Encode(buffer);
+             //wsw.WritePacket(speexBuffer, 0, speexBuffer.Length);
+             //wsw.Close();
+            if (args.Length >= 2)
             {
                 bool help = false, fullTest = false;
                 String inputFile, outputFile;
@@ -171,7 +171,7 @@ namespace speexcmd
             Console.Write(" -u      \"Ultra-wideband\" (32 kHz) input file\n");
             Console.Write(" --q n     Encoding quality (0-10)\n");
             Console.Write(" --ch n    File channels (1-2)\n\n");
-            Console.Write(" --rate n  Sampling rate for raw input");
+            Console.Write(" --rate n  Sampling rate for raw input\n");
 
             Console.Write("FOR DECODING\n");
             Console.Write("Decodes input_file spx file to raw file.\n");

@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+
+int durationIndex = 0;
+
 void comment_init(char **comments, int* length, char *vendor_string);
 void comment_add(char **comments, int* length, char *tag, char *val);
 
@@ -57,9 +60,10 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	snprintf(vendor_string, sizeof(vendor_string), "Encoded with Speex %s", speex_version);
 
 	comment_init(&comments, &comments_length, vendor_string);
-	comment_add(&comments, &comments_length, "TITLE=", "ssss");
+	comment_add(&comments, &comments_length, "TITLE=", "saa1");
 	comment_add(&comments, &comments_length, "AUTHOR=", "uptivity");
 	comment_add(&comments, &comments_length, "FORMATTYPE=", (char*)speex_version);
+	comment_add(&comments, &comments_length, "DURATION=", "00000");
 	/*Initialize Ogg stream struct*/
 	srand(time(NULL));
 	if (ogg_stream_init(&os, rand()) == -1)
@@ -154,6 +158,7 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	   op.granulepos = 0;
 	   op.packetno = 1;
 	   ogg_stream_packetin(&os, &op);
+	   durationIndex = bytes_written + os.header_fill + os.body_fill - 5;
    }
 
    /* writing the rest of the speex header packets */
@@ -300,12 +305,18 @@ int SpeexEncoder::EncodeFromFile(FILE *fin)
 			bytes_written += ret;
 	}
 
-	fprintf(stderr, "Duration: %d\n", frame_size *id / rate);
+	int durationInSec = frame_size *id / rate;
+	fprintf(stderr, "Duration: %d\n", durationInSec);
 	int minutes = (int)(frame_size *id / rate)/60;
 	int seconds = (frame_size *id / rate) - (minutes * 60);
 	fprintf(stderr, "Duration Minutes: %d\n", minutes);
 	fprintf(stderr, "Duration Seconds: %d\n", seconds);
 	
+	char duration[5];
+	sprintf(duration, "%05d", durationInSec);
+
+	fseek(fout, durationIndex, SEEK_SET);
+	fputs(duration, fout);
 	fclose(fin);
 
 	return 0;
