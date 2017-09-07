@@ -57,6 +57,7 @@ bool SpeexDecoder::Decode(char** outBuffer, int* outBufferSize)
     short output[MAX_FRAME_SIZE];
     int frame_size = 0, granule_frame_size = 0;
     void *st = NULL;
+	int duration = 0;
     int packet_count = 0;
     int stream_init = 0;
     int quiet = 0;
@@ -146,6 +147,10 @@ bool SpeexDecoder::Decode(char** outBuffer, int* outBufferSize)
                 }
                 else if (packet_count == 1)
                 {
+					/*char* pos = strstr((char*)op.packet, "DURATION=");
+					pos += strlen("DURATION=");
+					printf("%s\n", pos);*/
+					
                     if (!quiet)
                         PrintComments((char*)op.packet, op.bytes);
                 }

@@ -63,7 +63,7 @@ int SpeexEncoder::Initialize(const char* filename, char* modeInput, int channels
 	comment_add(&comments, &comments_length, "TITLE=", "saa1");
 	comment_add(&comments, &comments_length, "AUTHOR=", "uptivity");
 	comment_add(&comments, &comments_length, "FORMATTYPE=", (char*)speex_version);
-	comment_add(&comments, &comments_length, "DURATION=", "00000");
+	comment_add(&comments, &comments_length, "DURATION=", "00349");
 	/*Initialize Ogg stream struct*/
 	srand(time(NULL));
 	if (ogg_stream_init(&os, rand()) == -1)
@@ -316,7 +316,7 @@ int SpeexEncoder::EncodeFromFile(FILE *fin)
 	sprintf(duration, "%05d", durationInSec);
 
 	fseek(fout, durationIndex, SEEK_SET);
-	fputs(duration, fout);
+	/*fputs(duration, fout);*/
 	fclose(fin);
 
 	return 0;
